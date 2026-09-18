@@ -2,11 +2,7 @@
 
 > 一個單檔案 HTML 實作的互動式元素週期表 —— 新擬態 + 玻璃擬態、四語言支援、溫度模擬、3D 元素卡片。
 
-**🌐 Language / 语言 / 語言 / 言語:**
-[English](README.md) ·
-[简体中文](README.zh-CN.md) ·
-[**繁體中文**](README.zh-TW.md) ·
-[日本語](README.ja.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [**繁體中文**](README.zh-TW.md) · [日本語](README.ja.md)
 
 ---
 
@@ -28,13 +24,20 @@
 
 ## 🖼️ 線上預覽
 
-**Live Demo:** https://VVinCentZhang.github.io/EzPTable/EzPTable.html
+**Live Demo:** https://VVinCentZhang.github.io/EzPTable/
 
-> 在 **Settings → Pages → Source: `main` 分支** 中開啟 GitHub Pages 即可存取。
+> 根路徑會自動跳轉到 `EzPTable.html`。
+> 若尚未開啟，請到 **Settings → Pages → Source: `main` 分支** 中啟用 GitHub Pages。
 
 ---
 
 ## 🚀 快速開始
+
+### 方式一：線上開啟
+
+直接造訪 👉 https://VVinCentZhang.github.io/EzPTable/
+
+### 方式二：本機執行
 
 1. 下載或複製本倉庫
 2. 用任意現代瀏覽器開啟 `EzPTable.html`
@@ -78,7 +81,8 @@ open EzPTable.html          # macOS
 
 ```
 EzPTable/
-├── EzPTable.html       # 全部程式碼集中於此單檔案
+├── EzPTable.html       # 主程式 —— 元素週期表
+├── index.html          # 重定向頁 → EzPTable.html
 ├── README.md           # English (default)
 ├── README.zh-CN.md     # 简体中文
 ├── README.zh-TW.md     # 繁體中文

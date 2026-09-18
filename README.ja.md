@@ -2,11 +2,7 @@
 
 > 単一 HTML ファイルで作られたインタラクティブな周期表 —— ニューモーフィズム + グラスモーフィズム、4 言語対応、温度シミュレーション、3D 元素カード。
 
-**🌐 Language / 语言 / 語言 / 言語:**
-[English](README.md) ·
-[简体中文](README.zh-CN.md) ·
-[繁體中文](README.zh-TW.md) ·
-[**日本語**](README.ja.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [**日本語**](README.ja.md)
 
 ---
 
@@ -28,13 +24,20 @@
 
 ## 🖼️ デモ
 
-**Live Demo:** https://VVinCentZhang.github.io/EzPTable/EzPTable.html
+**Live Demo:** https://VVinCentZhang.github.io/EzPTable/
 
-> **Settings → Pages → Source: `main` ブランチ** で GitHub Pages を有効にすると閲覧できます。
+> ルート URL は自動的に `EzPTable.html` へリダイレクトされます。
+> 未設定の場合は **Settings → Pages → Source: `main` ブランチ** で GitHub Pages を有効にしてください。
 
 ---
 
 ## 🚀 使い方
+
+### 方法 1：オンラインで開く
+
+👉 https://VVinCentZhang.github.io/EzPTable/ にアクセス
+
+### 方法 2：ローカルで実行
 
 1. このリポジトリをダウンロードまたはクローン
 2. 任意のモダンブラウザで `EzPTable.html` を開く
@@ -78,7 +81,8 @@ open EzPTable.html          # macOS
 
 ```
 EzPTable/
-├── EzPTable.html       # 全コードをこの 1 ファイルに集約
+├── EzPTable.html       # メインアプリ —— 周期表
+├── index.html          # リダイレクトページ → EzPTable.html
 ├── README.md           # English (default)
 ├── README.zh-CN.md     # 简体中文
 ├── README.zh-TW.md     # 繁體中文

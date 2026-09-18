@@ -2,11 +2,7 @@
 
 > 一个单文件 HTML 实现的交互式元素周期表 —— 新拟态 + 玻璃拟态、四语言支持、温度模拟、3D 元素卡片。
 
-**🌐 Language / 语言 / 語言 / 言語:**
-[English](README.md) ·
-[**简体中文**](README.zh-CN.md) ·
-[繁體中文](README.zh-TW.md) ·
-[日本語](README.ja.md)
+[English](README.md) · [**简体中文**](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md)
 
 ---
 
@@ -28,13 +24,20 @@
 
 ## 🖼️ 在线预览
 
-**Live Demo:** https://VVinCentZhang.github.io/EzPTable/EzPTable.html
+**Live Demo:** https://VVinCentZhang.github.io/EzPTable/
 
-> 在 **Settings → Pages → Source: `main` 分支** 中开启 GitHub Pages 即可访问。
+> 根路径会自动跳转到 `EzPTable.html`。
+> 若尚未开启，请到 **Settings → Pages → Source: `main` 分支** 中启用 GitHub Pages。
 
 ---
 
 ## 🚀 快速开始
+
+### 方式一：在线打开
+
+直接访问 👉 https://VVinCentZhang.github.io/EzPTable/
+
+### 方式二：本地运行
 
 1. 下载或克隆本仓库
 2. 用任意现代浏览器打开 `EzPTable.html`
@@ -78,7 +81,8 @@ open EzPTable.html          # macOS
 
 ```
 EzPTable/
-├── EzPTable.html       # 全部代码集中于此单文件
+├── EzPTable.html       # 主程序 —— 元素周期表
+├── index.html          # 重定向页 → EzPTable.html
 ├── README.md           # English (default)
 ├── README.zh-CN.md     # 简体中文
 ├── README.zh-TW.md     # 繁體中文

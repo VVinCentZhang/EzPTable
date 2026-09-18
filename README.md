@@ -2,11 +2,7 @@
 
 > An interactive periodic table in a single HTML file — neumorphism + glassmorphism, 4 languages, temperature simulation, and 3D element cards.
 
-**🌐 Language / 语言 / 語言 / 言語:**
-[**English**](README.md) ·
-[简体中文](README.zh-CN.md) ·
-[繁體中文](README.zh-TW.md) ·
-[日本語](README.ja.md)
+[**English**](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md)
 
 ---
 
@@ -28,13 +24,20 @@
 
 ## 🖼️ Demo
 
-**Live demo:** https://VVinCentZhang.github.io/EzPTable/EzPTable.html
+**Live demo:** https://VVinCentZhang.github.io/EzPTable/
 
-> Enable GitHub Pages in **Settings → Pages → Source: `main` branch** to activate.
+> The root URL automatically redirects to `EzPTable.html`.
+> Enable GitHub Pages in **Settings → Pages → Source: `main` branch** if not yet activated.
 
 ---
 
 ## 🚀 Getting Started
+
+### Option 1: Open online
+
+Just visit 👉 https://VVinCentZhang.github.io/EzPTable/
+
+### Option 2: Run locally
 
 1. Download or clone this repository
 2. Open `EzPTable.html` in any modern browser
@@ -78,7 +81,8 @@ open EzPTable.html          # macOS
 
 ```
 EzPTable/
-├── EzPTable.html       # Everything lives in this single file
+├── EzPTable.html       # Main app — the periodic table
+├── index.html          # Redirect page → EzPTable.html
 ├── README.md           # English (default)
 ├── README.zh-CN.md     # 简体中文
 ├── README.zh-TW.md     # 繁體中文
