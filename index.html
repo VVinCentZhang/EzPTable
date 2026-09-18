@@ -1,11 +1,2549 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=EzPTable.html">
-<title>Redirecting...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, viewport-fit=cover">
+    <title>元素周期表 · 新拟态+玻璃</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --surface: #E7E5E4;
+            --text: #1E2938;
+            --text-secondary: #5a6272;
+            --primary: #0033CC;
+            --shadow-dark: rgba(0, 0, 0, 0.12);
+            --shadow-light: rgba(255, 255, 255, 0.9);
+            --shadow-inset-dark: rgba(0, 0, 0, 0.08);
+            --shadow-inset-light: rgba(255, 255, 255, 0.95);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'Space Mono', 'Courier New', monospace;
+            --font-sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+            --cat-alkali-metal: #f2e4e6;
+            --cat-alkaline-earth: #f2ebe2;
+            --cat-transition-metal: #e2e8f2;
+            --cat-post-transition: #e0f0ee;
+            --cat-metalloid: #e4f0e0;
+            --cat-nonmetal: #eef2e0;
+            --cat-halogen: #ece0f0;
+            --cat-noble-gas: #e8e8e8;
+            --cat-lanthanide: #f0e2ec;
+            --cat-actinide: #f0e2e6;
+            --card-size: 58px;
+            --card-gap: 3px;
+            --pointer-x: 50%;
+            --pointer-y: 50%;
+            --pointer-from-left: 0.5;
+            --pointer-from-top: 0.5;
+            --glare-opacity: 0;
+            --phase-solid: #10B981;
+            --phase-liquid: #3B82F6;
+            --phase-gas: #EF4444;
+            --phase-unknown: #9CA3AF;
+            --glass-bg-opacity: 0.25;
+            --glass-border-opacity: 0.35;
+            --glass-blur: 12;
+            --glass-shadow-opacity: 0.12;
+            --uncommon-ox: #c0844a;
+
+            --phase-solid-card-bg: #ECFDF5;
+            --phase-solid-card-text: #065F46;
+            --phase-solid-card-border: #A7F3D0;
+            --phase-liquid-card-bg: #EFF6FF;
+            --phase-liquid-card-text: #1E3A5F;
+            --phase-liquid-card-border: #BFDBFE;
+            --phase-gas-card-bg: #FEF2F2;
+            --phase-gas-card-text: #991B1B;
+            --phase-gas-card-border: #FECACA;
+            --phase-unknown-card-bg: #F3F4F6;
+            --phase-unknown-card-text: #4B5563;
+            --phase-unknown-card-border: #D1D5DB;
+        }
+
+        [data-theme="dark"] {
+            --surface: #1e1e1e;
+            --text: #e5e5e5;
+            --text-secondary: #a3a3a3;
+            --shadow-dark: rgba(0, 0, 0, 0.6);
+            --shadow-light: rgba(255, 255, 255, 0.04);
+            --shadow-inset-dark: rgba(0, 0, 0, 0.5);
+            --shadow-inset-light: rgba(255, 255, 255, 0.03);
+            --primary: #4A7AFF;
+            --cat-alkali-metal: #2a1a1a;
+            --cat-alkaline-earth: #2a221a;
+            --cat-transition-metal: #1a1a2a;
+            --cat-post-transition: #1a2a2a;
+            --cat-metalloid: #1a2a1a;
+            --cat-nonmetal: #2a2a1a;
+            --cat-halogen: #2a1a2a;
+            --cat-noble-gas: #222222;
+            --cat-lanthanide: #2a1a22;
+            --cat-actinide: #2a1a1a;
+            --phase-solid: #34D399;
+            --phase-liquid: #60A5FA;
+            --phase-gas: #F87171;
+            --phase-unknown: #9CA3AF;
+            --glass-bg-opacity: 0.06;
+            --glass-border-opacity: 0.12;
+            --glass-shadow-opacity: 0.3;
+            --uncommon-ox: #e3b77c;
+
+            --phase-solid-card-bg: #0d2818;
+            --phase-solid-card-text: #6ee7b7;
+            --phase-solid-card-border: #065f46;
+            --phase-liquid-card-bg: #0c1b33;
+            --phase-liquid-card-text: #93c5fd;
+            --phase-liquid-card-border: #1e3a5f;
+            --phase-gas-card-bg: #2b1010;
+            --phase-gas-card-text: #fca5a5;
+            --phase-gas-card-border: #7f1d1d;
+            --phase-unknown-card-bg: #1a1a1a;
+            --phase-unknown-card-text: #d1d5db;
+            --phase-unknown-card-border: #4b5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: var(--surface);
+            font-family: var(--font-sans);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 12px 40px;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 0.3s, color 0.3s;
+            background-image: radial-gradient(ellipse at 20% 20%, rgba(0, 51, 204, 0.03) 0%, transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(0, 51, 204, 0.02) 0%, transparent 60%);
+        }
+        [data-theme="dark"] body {
+            background-image: radial-gradient(ellipse at 20% 20%, rgba(74, 122, 255, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(74, 122, 255, 0.04) 0%, transparent 60%);
+        }
+        .main-container {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .header-title {
+            font-weight: 700;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-sans);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .icon-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+        }
+        .search-wrapper {
+            position: relative;
+        }
+        .search-input {
+            background: var(--surface);
+            border: none;
+            border-radius: 40px;
+            padding: 10px 18px 10px 40px;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            color: var(--text);
+            box-shadow: inset 4px 4px 8px var(--shadow-inset-dark), inset -4px -4px 8px var(--shadow-inset-light);
+            width: 180px;
+            outline: none;
+            transition: all var(--transition-smooth);
+        }
+        .search-input:focus-visible {
+            width: 220px;
+            box-shadow: inset 4px 4px 8px var(--shadow-inset-dark), inset -4px -4px 8px var(--shadow-inset-light), 0 0 0 3px rgba(0, 51, 204, 0.25);
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            padding: 4px 8px;
+            border-radius: 50%;
+            display: none;
+        }
+        .search-clear.visible {
+            display: block;
+        }
+        .search-results-count {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            min-width: 50px;
+            text-align: right;
+            opacity: 0;
+        }
+        .search-results-count.visible {
+            opacity: 1;
+        }
+
+        .lang-theme-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, var(--glass-bg-opacity));
+            backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+            -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+            border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
+            box-shadow: 0 8px 32px rgba(0, 0, 0, var(--glass-shadow-opacity)), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+            overflow: visible;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        .lang-slider {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transition: left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 0;
+            overflow: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: left, width;
+        }
+        .lang-slider::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 40%, rgba(255, 255, 255, 0.2) 60%, transparent 100%);
+            animation: sliderShine 3s ease-in-out infinite alternate;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        @keyframes sliderShine {
+            0% {
+                transform: translateX(-100%) scaleX(1.5);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateX(100%) scaleX(1.5);
+                opacity: 0.6;
+            }
+        }
+        [data-theme="dark"] .lang-slider {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        [data-theme="dark"] .lang-slider::before {
+            animation: none !important;
+            opacity: 0 !important;
+            background: transparent !important;
+        }
+        .lang-btn {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            border: none;
+            border-radius: 30px;
+            padding: 5px 14px;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            line-height: 1.6;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            letter-spacing: 0.02em;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .lang-btn.active {
+            color: var(--primary);
+            text-shadow: 0 0 12px rgba(0, 51, 204, 0.2), 0 1px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
+            transform: scale(1.05);
+        }
+        .lang-btn:hover:not(.active) {
+            color: var(--text);
+            transform: scale(1.02);
+        }
+        [data-theme="dark"] .lang-btn {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        [data-theme="dark"] .lang-btn.active {
+            color: #4A7AFF;
+            text-shadow: 0 0 16px rgba(74, 122, 255, 0.4), 0 1px 6px rgba(0, 0, 0, 0.5);
+        }
+        [data-theme="dark"] .lang-btn:hover:not(.active) {
+            color: #fff;
+        }
+        .theme-btn {
+            background: transparent;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .theme-btn:hover {
+            color: var(--text);
+            transform: scale(1.1);
+        }
+        [data-theme="dark"] .theme-btn {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        [data-theme="dark"] .theme-btn:hover {
+            color: #fff;
+        }
+
+        .temp-panel {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 14px 22px;
+            box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .temp-icon {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+            width: 2em;
+            text-align: center;
+            transition: color 0.3s;
+        }
+        .temp-slider-wrap {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+            z-index: 1;
+        }
+        .temp-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--surface);
+            box-shadow: inset 2px 2px 4px var(--shadow-inset-dark), inset -2px -2px 4px var(--shadow-inset-light);
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .temp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--surface);
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .temp-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.12);
+        }
+        .temp-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--surface);
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        [data-theme="dark"] .temp-slider {
+            background: var(--surface);
+            box-shadow: inset 2px 2px 4px var(--shadow-inset-dark), inset -2px -2px 4px var(--shadow-inset-light);
+        }
+        [data-theme="dark"] .temp-slider::-webkit-slider-thumb {
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .temp-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.5rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+        .temp-display {
+            text-align: center;
+            min-width: 70px;
+            position: relative;
+            z-index: 1;
+        }
+        .temp-value-main {
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: color 0.15s;
+            font-family: var(--font-mono);
+        }
+        .temp-value-sub {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            transition: color 0.15s;
+            font-family: var(--font-mono);
+        }
+        .temp-btn {
+            background: var(--surface);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text);
+            box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+            transition: all var(--transition-smooth);
+            font-family: var(--font-sans);
+            position: relative;
+            z-index: 1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .temp-btn:active {
+            box-shadow: inset 3px 3px 6px var(--shadow-inset-dark), inset -3px -3px 6px var(--shadow-inset-light);
+        }
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .mode-toggle-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+        }
+        .mode-toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--surface);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: inset 2px 2px 4px var(--shadow-inset-dark), inset -2px -2px 4px var(--shadow-inset-light);
+            transition: background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mode-toggle-switch.active {
+            background: var(--primary);
+        }
+        .mode-toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .mode-toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+        .phase-legend-wrap {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 8px 16px;
+            box-shadow: inset 3px 3px 8px var(--shadow-inset-dark), inset -3px -3px 8px var(--shadow-inset-light);
+            display: flex;
+            align-items: center;
+            gap: 12px 20px;
+            flex-wrap: wrap;
+            font-size: 0.65rem;
+            transition: background 0.3s;
+        }
+        .phase-legend-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 0.6rem;
+            font-family: var(--font-sans);
+        }
+        .phase-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            color: var(--text);
+            font-family: var(--font-sans);
+        }
+        .phase-dot-sample {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+        }
+        .phase-item.solid .phase-dot-sample {
+            background: var(--phase-solid);
+        }
+        .phase-item.liquid .phase-dot-sample {
+            background: var(--phase-liquid);
+        }
+        .phase-item.gas .phase-dot-sample {
+            background: var(--phase-gas);
+        }
+        .phase-item.unknown .phase-dot-sample {
+            background: var(--phase-unknown);
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .legend-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-family: var(--font-sans);
+        }
+        .legend-chip {
+            padding: 6px 14px;
+            border-radius: 24px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition-smooth);
+            white-space: nowrap;
+            box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font-sans);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .legend-chip.active {
+            box-shadow: inset 3px 3px 6px var(--shadow-inset-dark), inset -3px -3px 6px var(--shadow-inset-light);
+            border-color: var(--primary);
+            transform: scale(0.97);
+        }
+        .legend-reset {
+            font-size: 0.6rem;
+            padding: 6px 14px;
+            border-radius: 24px;
+            cursor: pointer;
+            background: var(--surface);
+            border: 2px solid transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+            transition: all var(--transition-smooth);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .legend-reset:active {
+            box-shadow: inset 3px 3px 6px var(--shadow-inset-dark), inset -3px -3px 6px var(--shadow-inset-light);
+        }
+        .table-outer-wrapper {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 16px 10px 20px;
+            box-shadow: 10px 10px 24px var(--shadow-dark), -10px -10px 24px var(--shadow-light);
+            overflow-x: auto;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, var(--card-size));
+            grid-template-rows: repeat(9, var(--card-size));
+            gap: var(--card-gap);
+            justify-content: center;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        .element-card {
+            position: relative;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--card-bg, var(--surface));
+            box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+            border: 1.5px solid var(--card-border-color, transparent);
+            transition: transform 0.2s ease-out, box-shadow 0.3s, border-color 0.3s, opacity 0.3s, filter 0.3s;
+            overflow: hidden;
+            font-size: clamp(10px, calc(var(--card-size)/4), 18px);
+            font-family: var(--font-sans);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .element-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 14px var(--shadow-dark), -7px -7px 14px var(--shadow-light);
+            border-color: rgba(0, 51, 204, 0.3);
+            z-index: 10;
+        }
+        .element-card:active {
+            transform: scale(0.96) translateY(-3px);
+            transition: transform 0.12s ease-out;
+            box-shadow: 7px 7px 14px var(--shadow-dark), -7px -7px 14px var(--shadow-light);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .element-card:active {
+                transform: translateY(-3px);
+                transition: transform 0.05s;
+            }
+        }
+        .element-card.dimmed {
+            opacity: 0.35;
+            filter: grayscale(0.5);
+            pointer-events: none;
+        }
+        .element-card.highlighted {
+            border-color: rgba(0, 51, 204, 0.6);
+        }
+        .element-card .atomic-number {
+            position: absolute;
+            top: 0.2em;
+            left: 0.3em;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            line-height: 1;
+        }
+        .element-card .symbol {
+            position: absolute;
+            top: 0.2em;
+            right: 0.3em;
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--card-text, var(--text));
+            line-height: 1;
+            font-family: var(--font-mono);
+        }
+        .element-card .element-name {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 700;
+            color: var(--card-text, var(--text));
+            white-space: nowrap;
+            line-height: 1.1;
+            text-align: center;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: var(--font-sans);
+        }
+        .element-card .atomic-mass {
+            position: absolute;
+            bottom: 0.2em;
+            left: 0.3em;
+            font-size: 0.6em;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1;
+            font-family: var(--font-mono);
+        }
+        .element-card .phase-dot {
+            position: absolute;
+            bottom: 0.2em;
+            right: 0.2em;
+            width: 0.7em;
+            height: 0.7em;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .phase-dot.solid {
+            background: var(--phase-solid);
+        }
+        .phase-dot.liquid {
+            background: var(--phase-liquid);
+        }
+        .phase-dot.gas {
+            background: var(--phase-gas);
+        }
+        .phase-dot.unknown {
+            background: var(--phase-unknown);
+        }
+        .empty-slot {
+            background: transparent;
+            pointer-events: none;
+        }
+        .series-separator {
+            grid-column: 1/3;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding-right: 8px;
+            pointer-events: none;
+            font-family: var(--font-sans);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(30, 41, 56, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+            perspective: 1000px;
+            -webkit-perspective: 1000px;
+            touch-action: auto;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-dialog {
+            background: var(--surface);
+            border-radius: 24px;
+            width: min(500px, 92vw);
+            max-height: 92vh;
+            overflow: hidden;
+            box-shadow: 12px 12px 28px rgba(0, 0, 0, 0.18), -8px -8px 20px rgba(255, 255, 255, 0.7);
+            position: relative;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            will-change: transform;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            touch-action: auto;
+        }
+        .modal-card {
+            position: relative;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px 20px;
+            gap: 14px;
+            height: 100%;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            z-index: 5;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+        }
+        .modal-card::-webkit-scrollbar {
+            display: none;
+        }
+        .modal-glare {
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            pointer-events: none;
+            z-index: 18;
+            opacity: var(--glare-opacity);
+            background: radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y), rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.42) 6%, rgba(255, 255, 255, 0.28) 14%, rgba(255, 255, 255, 0.16) 26%, rgba(255, 255, 255, 0.07) 44%, rgba(255, 255, 255, 0.025) 66%, rgba(255, 255, 255, 0.006) 88%, transparent 100%);
+            mix-blend-mode: screen;
+            transition: opacity 0.3s ease;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        .modal-glare::after {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            border-radius: 32px;
+            pointer-events: none;
+            background: radial-gradient(ellipse at var(--pointer-x) var(--pointer-y), rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.09) 22%, rgba(255, 255, 255, 0.035) 48%, rgba(255, 255, 255, 0.008) 72%, transparent 100%);
+            mix-blend-mode: screen;
+            transition: opacity 0.3s ease;
+        }
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: var(--surface);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3), 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 30;
+            -webkit-tap-highlight-color: transparent;
+            transform: translateZ(70px) translate3d(calc((var(--pointer-from-left) - 0.5) * 20px), calc((var(--pointer-from-top) - 0.5) * 20px), 0);
+            -webkit-transform: translateZ(70px) translate3d(calc((var(--pointer-from-left) - 0.5) * 20px), calc((var(--pointer-from-top) - 0.5) * 20px), 0);
+        }
+        .modal-close:hover {
+            box-shadow: 0 22px 35px rgba(0, 0, 0, 0.4);
+            transform: translateZ(70px) scale(1.08) translate3d(calc((var(--pointer-from-left) - 0.5) * 20px), calc((var(--pointer-from-top) - 0.5) * 20px), 0);
+            -webkit-transform: translateZ(70px) scale(1.08) translate3d(calc((var(--pointer-from-left) - 0.5) * 20px), calc((var(--pointer-from-top) - 0.5) * 20px), 0);
+        }
+        .modal-symbol-badge {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 20;
+            font-family: var(--font-mono);
+            transform: translateZ(45px) translate3d(calc((var(--pointer-from-left) - 0.5) * 14px), calc((var(--pointer-from-top) - 0.5) * 14px), 0);
+            -webkit-transform: translateZ(45px) translate3d(calc((var(--pointer-from-left) - 0.5) * 14px), calc((var(--pointer-from-top) - 0.5) * 14px), 0);
+        }
+        .modal-element-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 20;
+            transform: translateZ(30px) translate3d(calc((var(--pointer-from-left) - 0.5) * 10px), calc((var(--pointer-from-top) - 0.5) * 10px), 0);
+            -webkit-transform: translateZ(30px) translate3d(calc((var(--pointer-from-left) - 0.5) * 10px), calc((var(--pointer-from-top) - 0.5) * 10px), 0);
+        }
+        .modal-element-name {
+            font-weight: 700;
+            font-size: 1.3rem;
+            font-family: var(--font-sans);
+        }
+        .modal-element-category {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: block;
+            font-weight: 500;
+            font-family: var(--font-sans);
+        }
+        .modal-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            position: relative;
+            z-index: 20;
+            transform: translateZ(20px) translate3d(calc((var(--pointer-from-left) - 0.5) * 7px), calc((var(--pointer-from-top) - 0.5) * 7px), 0);
+            -webkit-transform: translateZ(20px) translate3d(calc((var(--pointer-from-left) - 0.5) * 7px), calc((var(--pointer-from-top) - 0.5) * 7px), 0);
+        }
+        .modal-detail-item {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 6px 10px;
+            box-shadow: inset 2px 2px 5px var(--shadow-inset-dark), inset -2px -2px 5px var(--shadow-inset-light);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-detail-item span {
+            font-size: 0.55rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            font-family: var(--font-sans);
+        }
+        .modal-detail-item strong {
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+        }
+        .ox-uncommon {
+            color: var(--uncommon-ox);
+            font-weight: 400;
+        }
+        .modal-electron-config {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text);
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 10px 12px;
+            box-shadow: inset 3px 3px 6px var(--shadow-inset-dark), inset -3px -3px 6px var(--shadow-inset-light);
+            position: relative;
+            z-index: 20;
+            transform: translateZ(10px) translate3d(calc((var(--pointer-from-left) - 0.5) * 4px), calc((var(--pointer-from-top) - 0.5) * 4px), 0);
+            -webkit-transform: translateZ(10px) translate3d(calc((var(--pointer-from-left) - 0.5) * 4px), calc((var(--pointer-from-top) - 0.5) * 4px), 0);
+        }
+        .modal-electron-config sup {
+            font-size: 0.7em;
+            vertical-align: super;
+            line-height: 1;
+        }
+        .atom-animation-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 10px;
+            margin-top: 6px;
+            box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+            transform: translateZ(6px) translate3d(calc((var(--pointer-from-left) - 0.5) * 3px), calc((var(--pointer-from-top) - 0.5) * 3px), 0);
+            -webkit-transform: translateZ(6px) translate3d(calc((var(--pointer-from-left) - 0.5) * 3px), calc((var(--pointer-from-top) - 0.5) * 3px), 0);
+        }
+        .atom-svg {
+            width: 100%;
+            max-width: 260px;
+            height: auto;
+        }
+        .orbit {
+            transform-origin: 0px 0px;
+            -webkit-transform-origin: 0px 0px;
+        }
+        .orbit-1 {
+            animation: spin 3s linear infinite;
+        }
+        .orbit-2 {
+            animation: spin 4s linear infinite reverse;
+        }
+        .orbit-3 {
+            animation: spin 5s linear infinite;
+        }
+        .orbit-4 {
+            animation: spin 6s linear infinite reverse;
+        }
+        .orbit-5 {
+            animation: spin 7s linear infinite;
+        }
+        .orbit-6 {
+            animation: spin 8s linear infinite reverse;
+        }
+        .orbit-7 {
+            animation: spin 9s linear infinite;
+        }
+        .orbit-8 {
+            animation: spin 10s linear infinite reverse;
+        }
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        @keyframes modalBounceIn {
+            0% {
+                transform: scale(0.8) translateY(30px);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.03) translateY(-5px);
+                opacity: 1;
+            }
+            80% {
+                transform: scale(0.98) translateY(2px);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-dialog.bouncing-in {
+            animation: modalBounceIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+
+        @media (max-width: 700px) {
+            :root {
+                --card-size: 38px;
+            }
+            .modal-dialog {
+                width: 92vw;
+                max-height: 90vh;
+            }
+            .modal-symbol-badge {
+                width: 50px;
+                height: 50px;
+                font-size: 1.4rem;
+            }
+            .modal-close {
+                width: 32px;
+                height: 32px;
+            }
+            .modal-details-grid {
+                grid-template-columns: 1fr;
+            }
+            .atom-svg {
+                max-width: 200px;
+            }
+            .temp-panel {
+                gap: 10px;
+                padding: 12px 14px;
+            }
+            .phase-legend-wrap {
+                gap: 8px 14px;
+                padding: 6px 12px;
+                font-size: 0.6rem;
+            }
+            .legend-chip {
+                font-size: 0.55rem;
+                padding: 4px 10px;
+            }
+            .element-card {
+                font-size: clamp(8px, calc(var(--card-size)/4.5), 14px);
+            }
+            .header-actions {
+                gap: 8px;
+            }
+            .lang-btn {
+                padding: 2px 10px;
+                font-size: 0.6rem;
+            }
+            .search-input {
+                width: 140px;
+                font-size: 0.75rem;
+                padding: 8px 14px 8px 32px;
+            }
+            .search-input:focus-visible {
+                width: 170px;
+            }
+            .temp-btn {
+                padding: 6px 12px;
+                font-size: 0.6rem;
+            }
+            .mode-toggle-label {
+                font-size: 0.6rem;
+            }
+            .temp-icon {
+                font-size: 1.2rem;
+            }
+        }
+        @media (max-width: 450px) {
+            :root {
+                --card-size: 30px;
+            }
+            .element-card {
+                font-size: clamp(6px, calc(var(--card-size)/4.5), 11px);
+            }
+            .element-card .atomic-number {
+                font-size: 0.6em;
+            }
+            .element-card .symbol {
+                font-size: 0.7em;
+            }
+            .element-card .element-name {
+                font-size: 1em !important;
+            }
+            .element-card .atomic-mass {
+                font-size: 0.5em;
+            }
+            .element-card .phase-dot {
+                width: 0.6em;
+                height: 0.6em;
+            }
+        }
+    </style>
 </head>
 <body>
-<a href="EzPTable.html">Click here if not redirected.</a>
+    <div class="main-container">
+        <header class="header">
+            <h1 class="header-title" id="headerTitle"><span class="icon-dot"></span>元素周期表</h1>
+            <div class="header-actions">
+                <div class="search-wrapper">
+                    <span class="search-icon">⚲</span>
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索元素..." autocomplete="off">
+                    <button class="search-clear" id="searchClear">✕</button>
+                </div>
+                <span class="search-results-count" id="resultsCount"></span>
+                <div class="lang-theme-bar">
+                    <span class="lang-slider"></span>
+                    <button class="lang-btn active" data-lang="zh">简</button>
+                    <button class="lang-btn" data-lang="zh-tw">繁</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="ja">日</button>
+                    <button class="theme-btn" id="themeToggle" title="切换夜间模式">🌙</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="temp-panel">
+            <div class="temp-icon" id="tempIcon"><i class="fas fa-thermometer-half"></i></div>
+            <div class="temp-slider-wrap">
+                <input type="range" class="temp-slider" id="tempSlider" min="-273" max="6000" value="25" step="1">
+                <div class="temp-labels"><span>-273°C</span><span>1000°C</span><span>2000°C</span><span>3000°C</span><span>4000°C</span><span>6000°C</span></div>
+            </div>
+            <div class="temp-display">
+                <div class="temp-value-main" id="tempValueMain">25°C</div>
+                <div class="temp-value-sub" id="tempValueSub">298 K</div>
+            </div>
+            <button class="temp-btn" id="btnAbsoluteZero">-273°C</button>
+            <button class="temp-btn" id="btnRoomTemp">室温</button>
+            <button class="temp-btn" id="btnResetTemp">重置</button>
+            <div class="mode-toggle">
+                <span class="mode-toggle-label" id="phaseToggleLabel">按物态着色</span>
+                <div class="mode-toggle-switch" id="phaseColorToggle" title="切换物态着色"></div>
+            </div>
+        </div>
+
+        <div class="phase-legend-wrap">
+            <span class="phase-legend-label" id="phaseLegendLabel">● 物态</span>
+            <span class="phase-item solid"><span class="phase-dot-sample"></span><span id="phaseSolid">固体</span></span>
+            <span class="phase-item liquid"><span class="phase-dot-sample"></span><span id="phaseLiquid">液体</span></span>
+            <span class="phase-item gas"><span class="phase-dot-sample"></span><span id="phaseGas">气体</span></span>
+            <span class="phase-item unknown"><span class="phase-dot-sample"></span><span id="phaseUnknown">未知</span></span>
+        </div>
+
+        <nav class="legend" id="legend">
+            <span class="legend-label" id="categoryLabel">分类：</span>
+        </nav>
+
+        <div class="table-outer-wrapper">
+            <div class="periodic-table" id="periodicTable"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-glare" id="modalGlare"></div>
+            <div class="modal-card" id="modalCard">
+                <button class="modal-close" id="modalClose">✕</button>
+                <div class="modal-element-header" id="modalHeader"></div>
+                <div class="modal-details-grid" id="modalDetails"></div>
+                <div class="modal-electron-config" id="modalElectronConfig"></div>
+                <div class="atom-animation-container" id="atomContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const UI = {
+                'zh': {
+                    'header_title': '元素周期表',
+                    'search_placeholder': '搜索元素...',
+                    'category_label': '分类：',
+                    'phase_legend': '● 物态',
+                    'solid': '固体',
+                    'liquid': '液体',
+                    'gas': '气体',
+                    'unknown': '未知',
+                    'btn_abs_zero': '-273°C',
+                    'btn_room': '室温',
+                    'btn_reset': '重置',
+                    'phase_toggle': '按物态着色',
+                    'modal_atomic': '原子序数',
+                    'modal_mass': '原子量',
+                    'modal_state': '状态',
+                    'modal_melt': '熔点',
+                    'modal_boil': '沸点',
+                    'modal_en': '电负性',
+                    'modal_radius': '半径',
+                    'modal_density': '密度',
+                    'modal_year': '发现',
+                    'modal_config': '电子构型',
+                    'modal_oxidation': '氧化态',
+                    'search_count': '找到 {n} 个',
+                    'show_all': '全部显示'
+                },
+                'zh-tw': {
+                    'header_title': '元素週期表',
+                    'search_placeholder': '搜尋元素...',
+                    'category_label': '分類：',
+                    'phase_legend': '● 物態',
+                    'solid': '固體',
+                    'liquid': '液體',
+                    'gas': '氣體',
+                    'unknown': '未知',
+                    'btn_abs_zero': '-273°C',
+                    'btn_room': '室溫',
+                    'btn_reset': '重置',
+                    'phase_toggle': '按物態著色',
+                    'modal_atomic': '原子序數',
+                    'modal_mass': '原子量',
+                    'modal_state': '狀態',
+                    'modal_melt': '熔點',
+                    'modal_boil': '沸點',
+                    'modal_en': '電負性',
+                    'modal_radius': '半徑',
+                    'modal_density': '密度',
+                    'modal_year': '發現',
+                    'modal_config': '電子構型',
+                    'modal_oxidation': '氧化態',
+                    'search_count': '找到 {n} 個',
+                    'show_all': '全部顯示'
+                },
+                'en': {
+                    'header_title': 'Periodic Table',
+                    'search_placeholder': 'Search elements...',
+                    'category_label': 'Category:',
+                    'phase_legend': '● State',
+                    'solid': 'Solid',
+                    'liquid': 'Liquid',
+                    'gas': 'Gas',
+                    'unknown': 'Unknown',
+                    'btn_abs_zero': '-273°C',
+                    'btn_room': 'Room',
+                    'btn_reset': 'Reset',
+                    'phase_toggle': 'Color by state',
+                    'modal_atomic': 'Atomic #',
+                    'modal_mass': 'Atomic Mass',
+                    'modal_state': 'State',
+                    'modal_melt': 'Melting Point',
+                    'modal_boil': 'Boiling Point',
+                    'modal_en': 'Electroneg.',
+                    'modal_radius': 'Radius',
+                    'modal_density': 'Density',
+                    'modal_year': 'Discovery',
+                    'modal_config': 'Electron Config',
+                    'modal_oxidation': 'Oxidation States',
+                    'search_count': 'Found {n}',
+                    'show_all': 'Show All'
+                },
+                'ja': {
+                    'header_title': '周期表',
+                    'search_placeholder': '元素を検索...',
+                    'category_label': 'カテゴリ：',
+                    'phase_legend': '● 状態',
+                    'solid': '固体',
+                    'liquid': '液体',
+                    'gas': '気体',
+                    'unknown': '不明',
+                    'btn_abs_zero': '-273°C',
+                    'btn_room': '室温',
+                    'btn_reset': 'リセット',
+                    'phase_toggle': '状態で着色',
+                    'modal_atomic': '原子番号',
+                    'modal_mass': '原子量',
+                    'modal_state': '状態',
+                    'modal_melt': '融点',
+                    'modal_boil': '沸点',
+                    'modal_en': '電気陰性度',
+                    'modal_radius': '半径',
+                    'modal_density': '密度',
+                    'modal_year': '発見',
+                    'modal_config': '電子配置',
+                    'modal_oxidation': '酸化数',
+                    'search_count': '{n} 件見つかりました',
+                    'show_all': 'すべて表示'
+                }
+            };
+
+            const CATEGORY_NAMES = {
+                'alkali-metal': { 'zh': '碱金属', 'zh-tw': '鹼金屬', 'en': 'Alkali metal', 'ja': 'アルカリ金属' },
+                'alkaline-earth': { 'zh': '碱土金属', 'zh-tw': '鹼土金屬', 'en': 'Alkaline earth',
+                'ja': 'アルカリ土類金属' },
+                'transition-metal': { 'zh': '过渡金属', 'zh-tw': '過渡金屬', 'en': 'Transition metal', 'ja': '遷移金属' },
+                'post-transition': { 'zh': '后过渡金属', 'zh-tw': '後過渡金屬', 'en': 'Post-transition', 'ja': '貧金属' },
+                'metalloid': { 'zh': '类金属', 'zh-tw': '類金屬', 'en': 'Metalloid', 'ja': '半金属' },
+                'nonmetal': { 'zh': '非金属', 'zh-tw': '非金屬', 'en': 'Nonmetal', 'ja': '非金属' },
+                'halogen': { 'zh': '卤素', 'zh-tw': '鹵素', 'en': 'Halogen', 'ja': 'ハロゲン' },
+                'noble-gas': { 'zh': '稀有气体', 'zh-tw': '稀有氣體', 'en': 'Noble gas', 'ja': '希ガス' },
+                'lanthanide': { 'zh': '镧系', 'zh-tw': '鑭系', 'en': 'Lanthanide', 'ja': 'ランタノイド' },
+                'actinide': { 'zh': '锕系', 'zh-tw': '錒系', 'en': 'Actinide', 'ja': 'アクチノイド' }
+            };
+
+            const ELEM_NAMES = {
+                'H': { 'zh': '氢', 'zh-tw': '氫', 'en': 'Hydrogen', 'ja': '水素' },
+                'He': { 'zh': '氦', 'zh-tw': '氦', 'en': 'Helium', 'ja': 'ヘリウム' },
+                'Li': { 'zh': '锂', 'zh-tw': '鋰', 'en': 'Lithium', 'ja': 'リチウム' },
+                'Be': { 'zh': '铍', 'zh-tw': '鈹', 'en': 'Beryllium', 'ja': 'ベリリウム' },
+                'B': { 'zh': '硼', 'zh-tw': '硼', 'en': 'Boron', 'ja': 'ホウ素' },
+                'C': { 'zh': '碳', 'zh-tw': '碳', 'en': 'Carbon', 'ja': '炭素' },
+                'N': { 'zh': '氮', 'zh-tw': '氮', 'en': 'Nitrogen', 'ja': '窒素' },
+                'O': { 'zh': '氧', 'zh-tw': '氧', 'en': 'Oxygen', 'ja': '酸素' },
+                'F': { 'zh': '氟', 'zh-tw': '氟', 'en': 'Fluorine', 'ja': 'フッ素' },
+                'Ne': { 'zh': '氖', 'zh-tw': '氖', 'en': 'Neon', 'ja': 'ネオン' },
+                'Na': { 'zh': '钠', 'zh-tw': '鈉', 'en': 'Sodium', 'ja': 'ナトリウム' },
+                'Mg': { 'zh': '镁', 'zh-tw': '鎂', 'en': 'Magnesium', 'ja': 'マグネシウム' },
+                'Al': { 'zh': '铝', 'zh-tw': '鋁', 'en': 'Aluminium', 'ja': 'アルミニウム' },
+                'Si': { 'zh': '硅', 'zh-tw': '矽', 'en': 'Silicon', 'ja': 'ケイ素' },
+                'P': { 'zh': '磷', 'zh-tw': '磷', 'en': 'Phosphorus', 'ja': 'リン' },
+                'S': { 'zh': '硫', 'zh-tw': '硫', 'en': 'Sulfur', 'ja': '硫黄' },
+                'Cl': { 'zh': '氯', 'zh-tw': '氯', 'en': 'Chlorine', 'ja': '塩素' },
+                'Ar': { 'zh': '氩', 'zh-tw': '氬', 'en': 'Argon', 'ja': 'アルゴン' },
+                'K': { 'zh': '钾', 'zh-tw': '鉀', 'en': 'Potassium', 'ja': 'カリウム' },
+                'Ca': { 'zh': '钙', 'zh-tw': '鈣', 'en': 'Calcium', 'ja': 'カルシウム' },
+                'Sc': { 'zh': '钪', 'zh-tw': '鈧', 'en': 'Scandium', 'ja': 'スカンジウム' },
+                'Ti': { 'zh': '钛', 'zh-tw': '鈦', 'en': 'Titanium', 'ja': 'チタン' },
+                'V': { 'zh': '钒', 'zh-tw': '釩', 'en': 'Vanadium', 'ja': 'バナジウム' },
+                'Cr': { 'zh': '铬', 'zh-tw': '鉻', 'en': 'Chromium', 'ja': 'クロム' },
+                'Mn': { 'zh': '锰', 'zh-tw': '錳', 'en': 'Manganese', 'ja': 'マンガン' },
+                'Fe': { 'zh': '铁', 'zh-tw': '鐵', 'en': 'Iron', 'ja': '鉄' },
+                'Co': { 'zh': '钴', 'zh-tw': '鈷', 'en': 'Cobalt', 'ja': 'コバルト' },
+                'Ni': { 'zh': '镍', 'zh-tw': '鎳', 'en': 'Nickel', 'ja': 'ニッケル' },
+                'Cu': { 'zh': '铜', 'zh-tw': '銅', 'en': 'Copper', 'ja': '銅' },
+                'Zn': { 'zh': '锌', 'zh-tw': '鋅', 'en': 'Zinc', 'ja': '亜鉛' },
+                'Ga': { 'zh': '镓', 'zh-tw': '鎵', 'en': 'Gallium', 'ja': 'ガリウム' },
+                'Ge': { 'zh': '锗', 'zh-tw': '鍺', 'en': 'Germanium', 'ja': 'ゲルマニウム' },
+                'As': { 'zh': '砷', 'zh-tw': '砷', 'en': 'Arsenic', 'ja': 'ヒ素' },
+                'Se': { 'zh': '硒', 'zh-tw': '硒', 'en': 'Selenium', 'ja': 'セレン' },
+                'Br': { 'zh': '溴', 'zh-tw': '溴', 'en': 'Bromine', 'ja': '臭素' },
+                'Kr': { 'zh': '氪', 'zh-tw': '氪', 'en': 'Krypton', 'ja': 'クリプトン' },
+                'Rb': { 'zh': '铷', 'zh-tw': '銣', 'en': 'Rubidium', 'ja': 'ルビジウム' },
+                'Sr': { 'zh': '锶', 'zh-tw': '鍶', 'en': 'Strontium', 'ja': 'ストロンチウム' },
+                'Y': { 'zh': '钇', 'zh-tw': '釔', 'en': 'Yttrium', 'ja': 'イットリウム' },
+                'Zr': { 'zh': '锆', 'zh-tw': '鋯', 'en': 'Zirconium', 'ja': 'ジルコニウム' },
+                'Nb': { 'zh': '铌', 'zh-tw': '鈮', 'en': 'Niobium', 'ja': 'ニオブ' },
+                'Mo': { 'zh': '钼', 'zh-tw': '鉬', 'en': 'Molybdenum', 'ja': 'モリブデン' },
+                'Tc': { 'zh': '锝', 'zh-tw': '鎝', 'en': 'Technetium', 'ja': 'テクネチウム' },
+                'Ru': { 'zh': '钌', 'zh-tw': '釕', 'en': 'Ruthenium', 'ja': 'ルテニウム' },
+                'Rh': { 'zh': '铑', 'zh-tw': '銠', 'en': 'Rhodium', 'ja': 'ロジウム' },
+                'Pd': { 'zh': '钯', 'zh-tw': '鈀', 'en': 'Palladium', 'ja': 'パラジウム' },
+                'Ag': { 'zh': '银', 'zh-tw': '銀', 'en': 'Silver', 'ja': '銀' },
+                'Cd': { 'zh': '镉', 'zh-tw': '鎘', 'en': 'Cadmium', 'ja': 'カドミウム' },
+                'In': { 'zh': '铟', 'zh-tw': '銦', 'en': 'Indium', 'ja': 'インジウム' },
+                'Sn': { 'zh': '锡', 'zh-tw': '錫', 'en': 'Tin', 'ja': 'スズ' },
+                'Sb': { 'zh': '锑', 'zh-tw': '銻', 'en': 'Antimony', 'ja': 'アンチモン' },
+                'Te': { 'zh': '碲', 'zh-tw': '碲', 'en': 'Tellurium', 'ja': 'テルル' },
+                'I': { 'zh': '碘', 'zh-tw': '碘', 'en': 'Iodine', 'ja': 'ヨウ素' },
+                'Xe': { 'zh': '氙', 'zh-tw': '氙', 'en': 'Xenon', 'ja': 'キセノン' },
+                'Cs': { 'zh': '铯', 'zh-tw': '銫', 'en': 'Caesium', 'ja': 'セシウム' },
+                'Ba': { 'zh': '钡', 'zh-tw': '鋇', 'en': 'Barium', 'ja': 'バリウム' },
+                'La': { 'zh': '镧', 'zh-tw': '鑭', 'en': 'Lanthanum', 'ja': 'ランタン' },
+                'Ce': { 'zh': '铈', 'zh-tw': '鈰', 'en': 'Cerium', 'ja': 'セリウム' },
+                'Pr': { 'zh': '镨', 'zh-tw': '鐠', 'en': 'Praseodymium', 'ja': 'プラセオジム' },
+                'Nd': { 'zh': '钕', 'zh-tw': '釹', 'en': 'Neodymium', 'ja': 'ネオジム' },
+                'Pm': { 'zh': '钷', 'zh-tw': '鉕', 'en': 'Promethium', 'ja': 'プロメチウム' },
+                'Sm': { 'zh': '钐', 'zh-tw': '釤', 'en': 'Samarium', 'ja': 'サマリウム' },
+                'Eu': { 'zh': '铕', 'zh-tw': '銪', 'en': 'Europium', 'ja': 'ユウロピウム' },
+                'Gd': { 'zh': '钆', 'zh-tw': '釓', 'en': 'Gadolinium', 'ja': 'ガドリニウム' },
+                'Tb': { 'zh': '铽', 'zh-tw': '鋱', 'en': 'Terbium', 'ja': 'テルビウム' },
+                'Dy': { 'zh': '镝', 'zh-tw': '鏑', 'en': 'Dysprosium', 'ja': 'ジスプロシウム' },
+                'Ho': { 'zh': '钬', 'zh-tw': '鈥', 'en': 'Holmium', 'ja': 'ホルミウム' },
+                'Er': { 'zh': '铒', 'zh-tw': '鉺', 'en': 'Erbium', 'ja': 'エルビウム' },
+                'Tm': { 'zh': '铥', 'zh-tw': '銩', 'en': 'Thulium', 'ja': 'ツリウム' },
+                'Yb': { 'zh': '镱', 'zh-tw': '鐿', 'en': 'Ytterbium', 'ja': 'イッテルビウム' },
+                'Lu': { 'zh': '镥', 'zh-tw': '鑥', 'en': 'Lutetium', 'ja': 'ルテチウム' },
+                'Hf': { 'zh': '铪', 'zh-tw': '鉿', 'en': 'Hafnium', 'ja': 'ハフニウム' },
+                'Ta': { 'zh': '钽', 'zh-tw': '鉭', 'en': 'Tantalum', 'ja': 'タンタル' },
+                'W': { 'zh': '钨', 'zh-tw': '鎢', 'en': 'Tungsten', 'ja': 'タングステン' },
+                'Re': { 'zh': '铼', 'zh-tw': '錸', 'en': 'Rhenium', 'ja': 'レニウム' },
+                'Os': { 'zh': '锇', 'zh-tw': '鋨', 'en': 'Osmium', 'ja': 'オスミウム' },
+                'Ir': { 'zh': '铱', 'zh-tw': '銥', 'en': 'Iridium', 'ja': 'イリジウム' },
+                'Pt': { 'zh': '铂', 'zh-tw': '鉑', 'en': 'Platinum', 'ja': '白金' },
+                'Au': { 'zh': '金', 'zh-tw': '金', 'en': 'Gold', 'ja': '金' },
+                'Hg': { 'zh': '汞', 'zh-tw': '汞', 'en': 'Mercury', 'ja': '水銀' },
+                'Tl': { 'zh': '铊', 'zh-tw': '鉈', 'en': 'Thallium', 'ja': 'タリウム' },
+                'Pb': { 'zh': '铅', 'zh-tw': '鉛', 'en': 'Lead', 'ja': '鉛' },
+                'Bi': { 'zh': '铋', 'zh-tw': '鉍', 'en': 'Bismuth', 'ja': 'ビスマス' },
+                'Po': { 'zh': '钋', 'zh-tw': '釙', 'en': 'Polonium', 'ja': 'ポロニウム' },
+                'At': { 'zh': '砹', 'zh-tw': '砹', 'en': 'Astatine', 'ja': 'アスタチン' },
+                'Rn': { 'zh': '氡', 'zh-tw': '氡', 'en': 'Radon', 'ja': 'ラドン' },
+                'Fr': { 'zh': '钫', 'zh-tw': '鈁', 'en': 'Francium', 'ja': 'フランシウム' },
+                'Ra': { 'zh': '镭', 'zh-tw': '鐳', 'en': 'Radium', 'ja': 'ラジウム' },
+                'Ac': { 'zh': '锕', 'zh-tw': '錒', 'en': 'Actinium', 'ja': 'アクチニウム' },
+                'Th': { 'zh': '钍', 'zh-tw': '釷', 'en': 'Thorium', 'ja': 'トリウム' },
+                'Pa': { 'zh': '镤', 'zh-tw': '鏷', 'en': 'Protactinium', 'ja': 'プロトアクチニウム' },
+                'U': { 'zh': '铀', 'zh-tw': '鈾', 'en': 'Uranium', 'ja': 'ウラン' },
+                'Np': { 'zh': '镎', 'zh-tw': '錼', 'en': 'Neptunium', 'ja': 'ネプツニウム' },
+                'Pu': { 'zh': '钚', 'zh-tw': '鈽', 'en': 'Plutonium', 'ja': 'プルトニウム' },
+                'Am': { 'zh': '镅', 'zh-tw': '鋂', 'en': 'Americium', 'ja': 'アメリシウム' },
+                'Cm': { 'zh': '锔', 'zh-tw': '鋦', 'en': 'Curium', 'ja': 'キュリウム' },
+                'Bk': { 'zh': '锫', 'zh-tw': '錇', 'en': 'Berkelium', 'ja': 'バークリウム' },
+                'Cf': { 'zh': '锎', 'zh-tw': '鉲', 'en': 'Californium', 'ja': 'カリホルニウム' },
+                'Es': { 'zh': '锿', 'zh-tw': '鑀', 'en': 'Einsteinium', 'ja': 'アインスタイニウム' },
+                'Fm': { 'zh': '镄', 'zh-tw': '鐨', 'en': 'Fermium', 'ja': 'フェルミウム' },
+                'Md': { 'zh': '钔', 'zh-tw': '鍆', 'en': 'Mendelevium', 'ja': 'メンデレビウム' },
+                'No': { 'zh': '锘', 'zh-tw': '鍩', 'en': 'Nobelium', 'ja': 'ノーベリウム' },
+                'Lr': { 'zh': '铹', 'zh-tw': '鐒', 'en': 'Lawrencium', 'ja': 'ローレンシウム' },
+                'Rf': { 'zh': '𬬻', 'zh-tw': '鑪', 'en': 'Rutherfordium', 'ja': 'ラザホージウム' },
+                'Db': { 'zh': '𬭊', 'zh-tw': '𬭊', 'en': 'Dubnium', 'ja': 'ドブニウム' },
+                'Sg': { 'zh': '𬭳', 'zh-tw': '𬭳', 'en': 'Seaborgium', 'ja': 'シーボーギウム' },
+                'Bh': { 'zh': '𬭛', 'zh-tw': '𬭛', 'en': 'Bohrium', 'ja': 'ボーリウム' },
+                'Hs': { 'zh': '𬭶', 'zh-tw': '𬭶', 'en': 'Hassium', 'ja': 'ハッシウム' },
+                'Mt': { 'zh': '鿏', 'zh-tw': '鿏', 'en': 'Meitnerium', 'ja': 'マイトネリウム' },
+                'Ds': { 'zh': '𫟼', 'zh-tw': '𫟼', 'en': 'Darmstadtium', 'ja': 'ダームスタチウム' },
+                'Rg': { 'zh': '𬬭', 'zh-tw': '𬬭', 'en': 'Roentgenium', 'ja': 'レントゲニウム' },
+                'Cn': { 'zh': '鿔', 'zh-tw': '鿔', 'en': 'Copernicium', 'ja': 'コペルニシウム' },
+                'Nh': { 'zh': '鿭', 'zh-tw': '鿭', 'en': 'Nihonium', 'ja': 'ニホニウム' },
+                'Fl': { 'zh': '𫓧', 'zh-tw': '𫓧', 'en': 'Flerovium', 'ja': 'フレロビウム' },
+                'Mc': { 'zh': '镆', 'zh-tw': '鏌', 'en': 'Moscovium', 'ja': 'モスコビウム' },
+                'Lv': { 'zh': '𫟷', 'zh-tw': '𫟷', 'en': 'Livermorium', 'ja': 'リバモリウム' },
+                'Ts': { 'zh': '鿬', 'zh-tw': '鿬', 'en': 'Tennessine', 'ja': 'テネシン' },
+                'Og': { 'zh': '鿫', 'zh-tw': '鿫', 'en': 'Oganesson', 'ja': 'オガネソン' }
+            };
+
+            const elementsData = [
+                { "n": 1, "s": "H", "mass": "1.008", "cat": "nonmetal", "p": 1, "g": 1, "ec": "1s¹", "en": "2.20",
+                    "melt": 14.01, "boil": 20.28, "radius": 25, "density": 0.0000899, "year": 1766 },
+                { "n": 2, "s": "He", "mass": "4.0026", "cat": "noble-gas", "p": 1, "g": 18, "ec": "1s²", "en": "—",
+                    "melt": 0.95, "boil": 4.22, "radius": 31, "density": 0.0001785, "year": 1895 },
+                { "n": 3, "s": "Li", "mass": "6.94", "cat": "alkali-metal", "p": 2, "g": 1, "ec": "[He] 2s¹", "en": "0.98",
+                    "melt": 453.69, "boil": 1615, "radius": 152, "density": 0.534, "year": 1817 },
+                { "n": 4, "s": "Be", "mass": "9.0122", "cat": "alkaline-earth", "p": 2, "g": 2, "ec": "[He] 2s²",
+                    "en": "1.57", "melt": 1560, "boil": 2744, "radius": 112, "density": 1.85, "year": 1798 },
+                { "n": 5, "s": "B", "mass": "10.81", "cat": "metalloid", "p": 2, "g": 13, "ec": "[He] 2s² 2p¹", "en": "2.04",
+                    "melt": 2349, "boil": 4200, "radius": 87, "density": 2.34, "year": 1808 },
+                { "n": 6, "s": "C", "mass": "12.011", "cat": "nonmetal", "p": 2, "g": 14, "ec": "[He] 2s² 2p²", "en": "2.55",
+                    "melt": 3823, "boil": 4098, "radius": 67, "density": 2.267, "year": -3000 },
+                { "n": 7, "s": "N", "mass": "14.007", "cat": "nonmetal", "p": 2, "g": 15, "ec": "[He] 2s² 2p³", "en": "3.04",
+                    "melt": 63.15, "boil": 77.36, "radius": 56, "density": 0.0012506, "year": 1772 },
+                { "n": 8, "s": "O", "mass": "15.999", "cat": "nonmetal", "p": 2, "g": 16, "ec": "[He] 2s² 2p⁴", "en": "3.44",
+                    "melt": 54.36, "boil": 90.20, "radius": 48, "density": 0.001429, "year": 1774 },
+                { "n": 9, "s": "F", "mass": "18.998", "cat": "halogen", "p": 2, "g": 17, "ec": "[He] 2s² 2p⁵", "en": "3.98",
+                    "melt": 53.53, "boil": 85.03, "radius": 42, "density": 0.001696, "year": 1886 },
+                { "n": 10, "s": "Ne", "mass": "20.180", "cat": "noble-gas", "p": 2, "g": 18, "ec": "[He] 2s² 2p⁶",
+                    "en": "—", "melt": 24.56, "boil": 27.07, "radius": 38, "density": 0.0009002, "year": 1898 },
+                { "n": 11, "s": "Na", "mass": "22.990", "cat": "alkali-metal", "p": 3, "g": 1, "ec": "[Ne] 3s¹",
+                    "en": "0.93", "melt": 370.87, "boil": 1156, "radius": 186, "density": 0.97, "year": 1807 },
+                { "n": 12, "s": "Mg", "mass": "24.305", "cat": "alkaline-earth", "p": 3, "g": 2, "ec": "[Ne] 3s²",
+                    "en": "1.31", "melt": 923, "boil": 1363, "radius": 160, "density": 1.738, "year": 1755 },
+                { "n": 13, "s": "Al", "mass": "26.982", "cat": "post-transition", "p": 3, "g": 13,
+                    "ec": "[Ne] 3s² 3p¹", "en": "1.61", "melt": 933.47, "boil": 2792, "radius": 143, "density": 2.70,
+                    "year": 1825 },
+                { "n": 14, "s": "Si", "mass": "28.085", "cat": "metalloid", "p": 3, "g": 14, "ec": "[Ne] 3s² 3p²",
+                    "en": "1.90", "melt": 1687, "boil": 3538, "radius": 111, "density": 2.3290, "year": 1824 },
+                { "n": 15, "s": "P", "mass": "30.974", "cat": "nonmetal", "p": 3, "g": 15, "ec": "[Ne] 3s² 3p³",
+                    "en": "2.19", "melt": 317.3, "boil": 550, "radius": 98, "density": 1.82, "year": 1669 },
+                { "n": 16, "s": "S", "mass": "32.06", "cat": "nonmetal", "p": 3, "g": 16, "ec": "[Ne] 3s² 3p⁴",
+                    "en": "2.58", "melt": 388.36, "boil": 717.8, "radius": 88, "density": 2.07, "year": -500 },
+                { "n": 17, "s": "Cl", "mass": "35.45", "cat": "halogen", "p": 3, "g": 17, "ec": "[Ne] 3s² 3p⁵",
+                    "en": "3.16", "melt": 171.6, "boil": 239.11, "radius": 79, "density": 0.003214, "year": 1774 },
+                { "n": 18, "s": "Ar", "mass": "39.948", "cat": "noble-gas", "p": 3, "g": 18, "ec": "[Ne] 3s² 3p⁶",
+                    "en": "—", "melt": 83.80, "boil": 87.30, "radius": 71, "density": 0.001784, "year": 1894 },
+                { "n": 19, "s": "K", "mass": "39.098", "cat": "alkali-metal", "p": 4, "g": 1, "ec": "[Ar] 4s¹",
+                    "en": "0.82", "melt": 336.53, "boil": 1032, "radius": 227, "density": 0.89, "year": 1807 },
+                { "n": 20, "s": "Ca", "mass": "40.078", "cat": "alkaline-earth", "p": 4, "g": 2, "ec": "[Ar] 4s²",
+                    "en": "1.00", "melt": 1115, "boil": 1757, "radius": 197, "density": 1.54, "year": 1808 },
+                { "n": 21, "s": "Sc", "mass": "44.956", "cat": "transition-metal", "p": 4, "g": 3,
+                    "ec": "[Ar] 3d¹ 4s²", "en": "1.36", "melt": 1814, "boil": 3109, "radius": 162, "density": 2.99,
+                    "year": 1879 },
+                { "n": 22, "s": "Ti", "mass": "47.867", "cat": "transition-metal", "p": 4, "g": 4,
+                    "ec": "[Ar] 3d² 4s²", "en": "1.54", "melt": 1941, "boil": 3560, "radius": 147, "density": 4.54,
+                    "year": 1791 },
+                { "n": 23, "s": "V", "mass": "50.942", "cat": "transition-metal", "p": 4, "g": 5, "ec": "[Ar] 3d³ 4s²",
+                    "en": "1.63", "melt": 2183, "boil": 3680, "radius": 134, "density": 6.0, "year": 1801 },
+                { "n": 24, "s": "Cr", "mass": "51.996", "cat": "transition-metal", "p": 4, "g": 6,
+                    "ec": "[Ar] 3d⁵ 4s¹", "en": "1.66", "melt": 2180, "boil": 2944, "radius": 128, "density": 7.15,
+                    "year": 1797 },
+                { "n": 25, "s": "Mn", "mass": "54.938", "cat": "transition-metal", "p": 4, "g": 7,
+                    "ec": "[Ar] 3d⁵ 4s²", "en": "1.55", "melt": 1519, "boil": 2334, "radius": 127, "density": 7.44,
+                    "year": 1774 },
+                { "n": 26, "s": "Fe", "mass": "55.845", "cat": "transition-metal", "p": 4, "g": 8,
+                    "ec": "[Ar] 3d⁶ 4s²", "en": "1.83", "melt": 1811, "boil": 3134, "radius": 126, "density": 7.874,
+                    "year": -3000 },
+                { "n": 27, "s": "Co", "mass": "58.933", "cat": "transition-metal", "p": 4, "g": 9,
+                    "ec": "[Ar] 3d⁷ 4s²", "en": "1.88", "melt": 1768, "boil": 3200, "radius": 125, "density": 8.90,
+                    "year": 1735 },
+                { "n": 28, "s": "Ni", "mass": "58.693", "cat": "transition-metal", "p": 4, "g": 10,
+                    "ec": "[Ar] 3d⁸ 4s²", "en": "1.91", "melt": 1728, "boil": 3186, "radius": 124, "density": 8.908,
+                    "year": 1751 },
+                { "n": 29, "s": "Cu", "mass": "63.546", "cat": "transition-metal", "p": 4, "g": 11,
+                    "ec": "[Ar] 3d¹⁰ 4s¹", "en": "1.90", "melt": 1357.77, "boil": 2835, "radius": 128,
+                "density": 8.96, "year": -9000 },
+                { "n": 30, "s": "Zn", "mass": "65.38", "cat": "transition-metal", "p": 4, "g": 12,
+                    "ec": "[Ar] 3d¹⁰ 4s²", "en": "1.65", "melt": 692.68, "boil": 1180, "radius": 134,
+                "density": 7.134, "year": 1000 },
+                { "n": 31, "s": "Ga", "mass": "69.723", "cat": "post-transition", "p": 4, "g": 13,
+                    "ec": "[Ar] 3d¹⁰ 4s² 4p¹", "en": "1.81", "melt": 302.91, "boil": 2477, "radius": 135,
+                    "density": 5.91, "year": 1875 },
+                { "n": 32, "s": "Ge", "mass": "72.630", "cat": "metalloid", "p": 4, "g": 14,
+                    "ec": "[Ar] 3d¹⁰ 4s² 4p²", "en": "2.01", "melt": 1211.4, "boil": 3106, "radius": 122,
+                    "density": 5.323, "year": 1886 },
+                { "n": 33, "s": "As", "mass": "74.922", "cat": "metalloid", "p": 4, "g": 15,
+                    "ec": "[Ar] 3d¹⁰ 4s² 4p³", "en": "2.18", "melt": 1090, "boil": 887, "radius": 119, "density": 5.73,
+                    "year": 1250 },
+                { "n": 34, "s": "Se", "mass": "78.971", "cat": "nonmetal", "p": 4, "g": 16,
+                    "ec": "[Ar] 3d¹⁰ 4s² 4p⁴", "en": "2.55", "melt": 494, "boil": 958, "radius": 116, "density": 4.79,
+                    "year": 1817 },
+                { "n": 35, "s": "Br", "mass": "79.904", "cat": "halogen", "p": 4, "g": 17,
+                    "ec": "[Ar] 3d¹⁰ 4s² 4p⁵", "en": "2.96", "melt": 265.8, "boil": 332.0, "radius": 114,
+                    "density": 3.12, "year": 1826 },
+                { "n": 36, "s": "Kr", "mass": "83.798", "cat": "noble-gas", "p": 4, "g": 18,
+                    "ec": "[Ar] 3d¹⁰ 4s² 4p⁶", "en": "3.00", "melt": 115.79, "boil": 119.93, "radius": 112,
+                    "density": 0.00375, "year": 1898 },
+                { "n": 37, "s": "Rb", "mass": "85.468", "cat": "alkali-metal", "p": 5, "g": 1, "ec": "[Kr] 5s¹",
+                    "en": "0.82", "melt": 312.46, "boil": 961, "radius": 248, "density": 1.53, "year": 1861 },
+                { "n": 38, "s": "Sr", "mass": "87.62", "cat": "alkaline-earth", "p": 5, "g": 2, "ec": "[Kr] 5s²",
+                    "en": "0.95", "melt": 1050, "boil": 1655, "radius": 215, "density": 2.64, "year": 1790 },
+                { "n": 39, "s": "Y", "mass": "88.906", "cat": "transition-metal", "p": 5, "g": 3,
+                    "ec": "[Kr] 4d¹ 5s²", "en": "1.22", "melt": 1799, "boil": 3609, "radius": 180, "density": 4.47,
+                    "year": 1794 },
+                { "n": 40, "s": "Zr", "mass": "91.224", "cat": "transition-metal", "p": 5, "g": 4,
+                    "ec": "[Kr] 4d² 5s²", "en": "1.33", "melt": 2128, "boil": 4682, "radius": 160, "density": 6.51,
+                    "year": 1789 },
+                { "n": 41, "s": "Nb", "mass": "92.906", "cat": "transition-metal", "p": 5, "g": 5,
+                    "ec": "[Kr] 4d⁴ 5s¹", "en": "1.60", "melt": 2750, "boil": 5017, "radius": 146, "density": 8.57,
+                    "year": 1801 },
+                { "n": 42, "s": "Mo", "mass": "95.95", "cat": "transition-metal", "p": 5, "g": 6,
+                    "ec": "[Kr] 4d⁵ 5s¹", "en": "2.16", "melt": 2896, "boil": 4912, "radius": 139, "density": 10.2,
+                    "year": 1778 },
+                { "n": 43, "s": "Tc", "mass": "[98]", "cat": "transition-metal", "p": 5, "g": 7,
+                    "ec": "[Kr] 4d⁵ 5s²", "en": "1.90", "melt": 2430, "boil": 4538, "radius": 136, "density": 11.5,
+                    "year": 1937 },
+                { "n": 44, "s": "Ru", "mass": "101.07", "cat": "transition-metal", "p": 5, "g": 8,
+                    "ec": "[Kr] 4d⁷ 5s¹", "en": "2.20", "melt": 2607, "boil": 4423, "radius": 134, "density": 12.1,
+                    "year": 1844 },
+                { "n": 45, "s": "Rh", "mass": "102.91", "cat": "transition-metal", "p": 5, "g": 9,
+                    "ec": "[Kr] 4d⁸ 5s¹", "en": "2.28", "melt": 2237, "boil": 3968, "radius": 134, "density": 12.4,
+                    "year": 1803 },
+                { "n": 46, "s": "Pd", "mass": "106.42", "cat": "transition-metal", "p": 5, "g": 10,
+                    "ec": "[Kr] 4d¹⁰", "en": "2.20", "melt": 1828.05, "boil": 3236, "radius": 137, "density": 12.0,
+                    "year": 1803 },
+                { "n": 47, "s": "Ag", "mass": "107.87", "cat": "transition-metal", "p": 5, "g": 11,
+                    "ec": "[Kr] 4d¹⁰ 5s¹", "en": "1.93", "melt": 1234.93, "boil": 2435, "radius": 144,
+                    "density": 10.5, "year": -5000 },
+                { "n": 48, "s": "Cd", "mass": "112.41", "cat": "transition-metal", "p": 5, "g": 12,
+                    "ec": "[Kr] 4d¹⁰ 5s²", "en": "1.69", "melt": 594.22, "boil": 1040, "radius": 151,
+                "density": 8.65, "year": 1817 },
+                { "n": 49, "s": "In", "mass": "114.82", "cat": "post-transition", "p": 5, "g": 13,
+                    "ec": "[Kr] 4d¹⁰ 5s² 5p¹", "en": "1.78", "melt": 429.75, "boil": 2345, "radius": 167,
+                    "density": 7.31, "year": 1863 },
+                { "n": 50, "s": "Sn", "mass": "118.71", "cat": "post-transition", "p": 5, "g": 14,
+                    "ec": "[Kr] 4d¹⁰ 5s² 5p²", "en": "1.96", "melt": 505.08, "boil": 2875, "radius": 140,
+                    "density": 7.287, "year": -3000 },
+                { "n": 51, "s": "Sb", "mass": "121.76", "cat": "metalloid", "p": 5, "g": 15,
+                    "ec": "[Kr] 4d¹⁰ 5s² 5p³", "en": "2.05", "melt": 903.78, "boil": 1860, "radius": 140,
+                    "density": 6.68, "year": -3000 },
+                { "n": 52, "s": "Te", "mass": "127.60", "cat": "metalloid", "p": 5, "g": 16,
+                    "ec": "[Kr] 4d¹⁰ 5s² 5p⁴", "en": "2.10", "melt": 722.66, "boil": 1261, "radius": 135,
+                    "density": 6.24, "year": 1782 },
+                { "n": 53, "s": "I", "mass": "126.90", "cat": "halogen", "p": 5, "g": 17,
+                    "ec": "[Kr] 4d¹⁰ 5s² 5p⁵", "en": "2.66", "melt": 386.85, "boil": 457.4, "radius": 133,
+                    "density": 4.93, "year": 1811 },
+                { "n": 54, "s": "Xe", "mass": "131.29", "cat": "noble-gas", "p": 5, "g": 18,
+                    "ec": "[Kr] 4d¹⁰ 5s² 5p⁶", "en": "2.60", "melt": 161.4, "boil": 165.03, "radius": 131,
+                    "density": 0.0059, "year": 1898 },
+                { "n": 55, "s": "Cs", "mass": "132.91", "cat": "alkali-metal", "p": 6, "g": 1, "ec": "[Xe] 6s¹",
+                    "en": "0.79", "melt": 301.59, "boil": 944, "radius": 265, "density": 1.93, "year": 1860 },
+                { "n": 56, "s": "Ba", "mass": "137.33", "cat": "alkaline-earth", "p": 6, "g": 2, "ec": "[Xe] 6s²",
+                    "en": "0.89", "melt": 1000, "boil": 2170, "radius": 222, "density": 3.62, "year": 1808 },
+                { "n": 57, "s": "La", "mass": "138.91", "cat": "lanthanide", "p": 6, "g": 3, "ec": "[Xe] 5d¹ 6s²",
+                    "en": "1.10", "melt": 1193, "boil": 3737, "radius": 187, "density": 6.15, "year": 1839 },
+                { "n": 58, "s": "Ce", "mass": "140.12", "cat": "lanthanide", "p": 8, "g": 3,
+                    "ec": "[Xe] 4f¹ 5d¹ 6s²", "en": "1.12", "melt": 1071, "boil": 3697, "radius": 182,
+                    "density": 6.77, "year": 1803 },
+                { "n": 59, "s": "Pr", "mass": "140.91", "cat": "lanthanide", "p": 8, "g": 4, "ec": "[Xe] 4f³ 6s²",
+                    "en": "1.13", "melt": 1204, "boil": 3793, "radius": 182, "density": 6.77, "year": 1885 },
+                { "n": 60, "s": "Nd", "mass": "144.24", "cat": "lanthanide", "p": 8, "g": 5, "ec": "[Xe] 4f⁴ 6s²",
+                    "en": "1.14", "melt": 1289, "boil": 3347, "radius": 181, "density": 7.01, "year": 1885 },
+                { "n": 61, "s": "Pm", "mass": "[145]", "cat": "lanthanide", "p": 8, "g": 6, "ec": "[Xe] 4f⁵ 6s²",
+                    "en": "1.13", "melt": 1315, "boil": 3273, "radius": 181, "density": 7.26, "year": 1945 },
+                { "n": 62, "s": "Sm", "mass": "150.36", "cat": "lanthanide", "p": 8, "g": 7, "ec": "[Xe] 4f⁶ 6s²",
+                    "en": "1.17", "melt": 1345, "boil": 2067, "radius": 180, "density": 7.52, "year": 1879 },
+                { "n": 63, "s": "Eu", "mass": "151.96", "cat": "lanthanide", "p": 8, "g": 8, "ec": "[Xe] 4f⁷ 6s²",
+                    "en": "1.20", "melt": 1095, "boil": 1802, "radius": 204, "density": 5.24, "year": 1901 },
+                { "n": 64, "s": "Gd", "mass": "157.25", "cat": "lanthanide", "p": 8, "g": 9,
+                    "ec": "[Xe] 4f⁷ 5d¹ 6s²", "en": "1.20", "melt": 1585, "boil": 3546, "radius": 180,
+                    "density": 7.90, "year": 1880 },
+                { "n": 65, "s": "Tb", "mass": "158.93", "cat": "lanthanide", "p": 8, "g": 10, "ec": "[Xe] 4f⁹ 6s²",
+                    "en": "1.22", "melt": 1629, "boil": 3503, "radius": 178, "density": 8.23, "year": 1843 },
+                { "n": 66, "s": "Dy", "mass": "162.50", "cat": "lanthanide", "p": 8, "g": 11,
+                    "ec": "[Xe] 4f¹⁰ 6s²", "en": "1.23", "melt": 1680, "boil": 2840, "radius": 177,
+                "density": 8.55, "year": 1886 },
+                { "n": 67, "s": "Ho", "mass": "164.93", "cat": "lanthanide", "p": 8, "g": 12,
+                    "ec": "[Xe] 4f¹¹ 6s²", "en": "1.24", "melt": 1734, "boil": 2993, "radius": 176,
+                "density": 8.80, "year": 1879 },
+                { "n": 68, "s": "Er", "mass": "167.26", "cat": "lanthanide", "p": 8, "g": 13,
+                    "ec": "[Xe] 4f¹² 6s²", "en": "1.24", "melt": 1802, "boil": 3141, "radius": 175,
+                "density": 9.07, "year": 1843 },
+                { "n": 69, "s": "Tm", "mass": "168.93", "cat": "lanthanide", "p": 8, "g": 14,
+                    "ec": "[Xe] 4f¹³ 6s²", "en": "1.25", "melt": 1818, "boil": 2223, "radius": 174,
+                "density": 9.32, "year": 1879 },
+                { "n": 70, "s": "Yb", "mass": "173.05", "cat": "lanthanide", "p": 8, "g": 15,
+                    "ec": "[Xe] 4f¹⁴ 6s²", "en": "1.10", "melt": 1092, "boil": 1469, "radius": 194,
+                "density": 6.97, "year": 1878 },
+                { "n": 71, "s": "Lu", "mass": "174.97", "cat": "lanthanide", "p": 8, "g": 16,
+                    "ec": "[Xe] 4f¹⁴ 5d¹ 6s²", "en": "1.27", "melt": 1925, "boil": 3675, "radius": 173,
+                    "density": 9.84, "year": 1907 },
+                { "n": 72, "s": "Hf", "mass": "178.49", "cat": "transition-metal", "p": 6, "g": 4,
+                    "ec": "[Xe] 4f¹⁴ 5d² 6s²", "en": "1.30", "melt": 2506, "boil": 4876, "radius": 159,
+                    "density": 13.3, "year": 1923 },
+                { "n": 73, "s": "Ta", "mass": "180.95", "cat": "transition-metal", "p": 6, "g": 5,
+                    "ec": "[Xe] 4f¹⁴ 5d³ 6s²", "en": "1.50", "melt": 3290, "boil": 5731, "radius": 146,
+                    "density": 16.4, "year": 1802 },
+                { "n": 74, "s": "W", "mass": "183.84", "cat": "transition-metal", "p": 6, "g": 6,
+                    "ec": "[Xe] 4f¹⁴ 5d⁴ 6s²", "en": "2.36", "melt": 3695, "boil": 5828, "radius": 139,
+                    "density": 19.3, "year": 1783 },
+                { "n": 75, "s": "Re", "mass": "186.21", "cat": "transition-metal", "p": 6, "g": 7,
+                    "ec": "[Xe] 4f¹⁴ 5d⁵ 6s²", "en": "1.90", "melt": 3459, "boil": 5869, "radius": 137,
+                    "density": 21.0, "year": 1925 },
+                { "n": 76, "s": "Os", "mass": "190.23", "cat": "transition-metal", "p": 6, "g": 8,
+                    "ec": "[Xe] 4f¹⁴ 5d⁶ 6s²", "en": "2.20", "melt": 3306, "boil": 5285, "radius": 135,
+                    "density": 22.6, "year": 1803 },
+                { "n": 77, "s": "Ir", "mass": "192.22", "cat": "transition-metal", "p": 6, "g": 9,
+                    "ec": "[Xe] 4f¹⁴ 5d⁷ 6s²", "en": "2.20", "melt": 2719, "boil": 4701, "radius": 136,
+                    "density": 22.5, "year": 1803 },
+                { "n": 78, "s": "Pt", "mass": "195.08", "cat": "transition-metal", "p": 6, "g": 10,
+                    "ec": "[Xe] 4f¹⁴ 5d⁹ 6s¹", "en": "2.28", "melt": 2041.4, "boil": 4098, "radius": 139,
+                    "density": 21.4, "year": 1735 },
+                { "n": 79, "s": "Au", "mass": "196.97", "cat": "transition-metal", "p": 6, "g": 11,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", "en": "2.54", "melt": 1337.33, "boil": 3129, "radius": 144,
+                    "density": 19.3, "year": -2500 },
+                { "n": 80, "s": "Hg", "mass": "200.59", "cat": "transition-metal", "p": 6, "g": 12,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s²", "en": "2.00", "melt": 234.32, "boil": 629.88, "radius": 151,
+                    "density": 13.534, "year": -1500 },
+                { "n": 81, "s": "Tl", "mass": "204.38", "cat": "post-transition", "p": 6, "g": 13,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", "en": "1.62", "melt": 577, "boil": 1746, "radius": 171,
+                    "density": 11.8, "year": 1861 },
+                { "n": 82, "s": "Pb", "mass": "207.2", "cat": "post-transition", "p": 6, "g": 14,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", "en": "2.33", "melt": 600.61, "boil": 2022, "radius": 175,
+                    "density": 11.34, "year": -7000 },
+                { "n": 83, "s": "Bi", "mass": "208.98", "cat": "post-transition", "p": 6, "g": 15,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", "en": "2.02", "melt": 544.7, "boil": 1837, "radius": 156,
+                    "density": 9.78, "year": 1753 },
+                { "n": 84, "s": "Po", "mass": "[209]", "cat": "post-transition", "p": 6, "g": 16,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", "en": "2.00", "melt": 527, "boil": 1235, "radius": 167,
+                    "density": 9.4, "year": 1898 },
+                { "n": 85, "s": "At", "mass": "[210]", "cat": "halogen", "p": 6, "g": 17,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", "en": "2.20", "melt": 575, "boil": 610, "radius": 140,
+                    "density": 7.0, "year": 1940 },
+                { "n": 86, "s": "Rn", "mass": "[222]", "cat": "noble-gas", "p": 6, "g": 18,
+                    "ec": "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", "en": "—", "melt": 202, "boil": 211.3, "radius": 120,
+                    "density": 0.00973, "year": 1900 },
+                { "n": 87, "s": "Fr", "mass": "[223]", "cat": "alkali-metal", "p": 7, "g": 1, "ec": "[Rn] 7s¹",
+                    "en": "0.70", "melt": 300, "boil": 950, "radius": 270, "density": 1.87, "year": 1939 },
+                { "n": 88, "s": "Ra", "mass": "[226]", "cat": "alkaline-earth", "p": 7, "g": 2, "ec": "[Rn] 7s²",
+                    "en": "0.90", "melt": 973, "boil": 2010, "radius": 215, "density": 5.5, "year": 1898 },
+                { "n": 89, "s": "Ac", "mass": "[227]", "cat": "actinide", "p": 7, "g": 3, "ec": "[Rn] 6d¹ 7s²",
+                    "en": "1.10", "melt": 1323, "boil": 3471, "radius": 195, "density": 10.07, "year": 1899 },
+                { "n": 90, "s": "Th", "mass": "232.04", "cat": "actinide", "p": 9, "g": 3, "ec": "[Rn] 6d² 7s²",
+                    "en": "1.30", "melt": 2023, "boil": 5061, "radius": 179, "density": 11.7, "year": 1828 },
+                { "n": 91, "s": "Pa", "mass": "231.04", "cat": "actinide", "p": 9, "g": 4,
+                    "ec": "[Rn] 5f² 6d¹ 7s²", "en": "1.50", "melt": 1845, "boil": 4273, "radius": 163,
+                    "density": 15.4, "year": 1913 },
+                { "n": 92, "s": "U", "mass": "238.03", "cat": "actinide", "p": 9, "g": 5,
+                    "ec": "[Rn] 5f³ 6d¹ 7s²", "en": "1.38", "melt": 1408, "boil": 4404, "radius": 156,
+                    "density": 19.1, "year": 1789 },
+                { "n": 93, "s": "Np", "mass": "[237]", "cat": "actinide", "p": 9, "g": 6,
+                    "ec": "[Rn] 5f⁴ 6d¹ 7s²", "en": "1.36", "melt": 917, "boil": 4175, "radius": 155,
+                    "density": 20.2, "year": 1940 },
+                { "n": 94, "s": "Pu", "mass": "[244]", "cat": "actinide", "p": 9, "g": 7, "ec": "[Rn] 5f⁶ 7s²",
+                    "en": "1.28", "melt": 913, "boil": 3501, "radius": 159, "density": 19.8, "year": 1940 },
+                { "n": 95, "s": "Am", "mass": "[243]", "cat": "actinide", "p": 9, "g": 8, "ec": "[Rn] 5f⁷ 7s²",
+                    "en": "1.30", "melt": 1449, "boil": 2880, "radius": 173, "density": 13.7, "year": 1944 },
+                { "n": 96, "s": "Cm", "mass": "[247]", "cat": "actinide", "p": 9, "g": 9,
+                    "ec": "[Rn] 5f⁷ 6d¹ 7s²", "en": "1.30", "melt": 1613, "boil": 3383, "radius": 174,
+                    "density": 13.5, "year": 1944 },
+                { "n": 97, "s": "Bk", "mass": "[247]", "cat": "actinide", "p": 9, "g": 10, "ec": "[Rn] 5f⁹ 7s²",
+                    "en": "1.30", "melt": 1259, "boil": 2900, "radius": 170, "density": 14.8, "year": 1949 },
+                { "n": 98, "s": "Cf", "mass": "[251]", "cat": "actinide", "p": 9, "g": 11, "ec": "[Rn] 5f¹⁰ 7s²",
+                    "en": "1.30", "melt": 1173, "boil": 1743, "radius": 168, "density": 15.1, "year": 1950 },
+                { "n": 99, "s": "Es", "mass": "[252]", "cat": "actinide", "p": 9, "g": 12, "ec": "[Rn] 5f¹¹ 7s²",
+                    "en": "1.30", "melt": 1133, "boil": 1269, "radius": 165, "density": 8.84, "year": 1952 },
+                { "n": 100, "s": "Fm", "mass": "[257]", "cat": "actinide", "p": 9, "g": 13, "ec": "[Rn] 5f¹² 7s²",
+                    "en": "1.30", "melt": 1800, "boil": null, "radius": null, "density": null, "year": 1952 },
+                { "n": 101, "s": "Md", "mass": "[258]", "cat": "actinide", "p": 9, "g": 14, "ec": "[Rn] 5f¹³ 7s²",
+                    "en": "1.30", "melt": 1100, "boil": null, "radius": null, "density": null, "year": 1955 },
+                { "n": 102, "s": "No", "mass": "[259]", "cat": "actinide", "p": 9, "g": 15, "ec": "[Rn] 5f¹⁴ 7s²",
+                    "en": "1.30", "melt": 1100, "boil": null, "radius": null, "density": null, "year": 1958 },
+                { "n": 103, "s": "Lr", "mass": "[266]", "cat": "actinide", "p": 9, "g": 16,
+                    "ec": "[Rn] 5f¹⁴ 7s² 7p¹", "en": "—", "melt": 1900, "boil": null, "radius": null,
+                    "density": null, "year": 1961 },
+                { "n": 104, "s": "Rf", "mass": "[267]", "cat": "transition-metal", "p": 7, "g": 4,
+                    "ec": "[Rn] 5f¹⁴ 6d² 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1964 },
+                { "n": 105, "s": "Db", "mass": "[268]", "cat": "transition-metal", "p": 7, "g": 5,
+                    "ec": "[Rn] 5f¹⁴ 6d³ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1967 },
+                { "n": 106, "s": "Sg", "mass": "[269]", "cat": "transition-metal", "p": 7, "g": 6,
+                    "ec": "[Rn] 5f¹⁴ 6d⁴ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1974 },
+                { "n": 107, "s": "Bh", "mass": "[270]", "cat": "transition-metal", "p": 7, "g": 7,
+                    "ec": "[Rn] 5f¹⁴ 6d⁵ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1981 },
+                { "n": 108, "s": "Hs", "mass": "[269]", "cat": "transition-metal", "p": 7, "g": 8,
+                    "ec": "[Rn] 5f¹⁴ 6d⁶ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1984 },
+                { "n": 109, "s": "Mt", "mass": "[278]", "cat": "transition-metal", "p": 7, "g": 9,
+                    "ec": "[Rn] 5f¹⁴ 6d⁷ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1982 },
+                { "n": 110, "s": "Ds", "mass": "[281]", "cat": "transition-metal", "p": 7, "g": 10,
+                    "ec": "[Rn] 5f¹⁴ 6d⁸ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1994 },
+                { "n": 111, "s": "Rg", "mass": "[282]", "cat": "transition-metal", "p": 7, "g": 11,
+                    "ec": "[Rn] 5f¹⁴ 6d⁹ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1994 },
+                { "n": 112, "s": "Cn", "mass": "[285]", "cat": "transition-metal", "p": 7, "g": 12,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1996 },
+                { "n": 113, "s": "Nh", "mass": "[286]", "cat": "post-transition", "p": 7, "g": 13,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 2004 },
+                { "n": 114, "s": "Fl", "mass": "[289]", "cat": "post-transition", "p": 7, "g": 14,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 1999 },
+                { "n": 115, "s": "Mc", "mass": "[290]", "cat": "post-transition", "p": 7, "g": 15,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 2003 },
+                { "n": 116, "s": "Lv", "mass": "[293]", "cat": "post-transition", "p": 7, "g": 16,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 2000 },
+                { "n": 117, "s": "Ts", "mass": "[294]", "cat": "halogen", "p": 7, "g": 17,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 2010 },
+                { "n": 118, "s": "Og", "mass": "[294]", "cat": "noble-gas", "p": 7, "g": 18,
+                    "ec": "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", "en": "—", "melt": null, "boil": null, "radius": null,
+                    "density": null, "year": 2002 }
+            ];
+
+            const categoryConfig = {
+                'alkali-metal': { bg: 'var(--cat-alkali-metal)', text: '#8b3a4a' },
+                'alkaline-earth': { bg: 'var(--cat-alkaline-earth)', text: '#8b5e3a' },
+                'transition-metal': { bg: 'var(--cat-transition-metal)', text: '#3a528b' },
+                'post-transition': { bg: 'var(--cat-post-transition)', text: '#3a7a6e' },
+                'metalloid': { bg: 'var(--cat-metalloid)', text: '#4a7a3a' },
+                'nonmetal': { bg: 'var(--cat-nonmetal)', text: '#6a7a3a' },
+                'halogen': { bg: 'var(--cat-halogen)', text: '#6a3a8b' },
+                'noble-gas': { bg: 'var(--cat-noble-gas)', text: '#5a5a6a' },
+                'lanthanide': { bg: 'var(--cat-lanthanide)', text: '#7a3a6a' },
+                'actinide': { bg: 'var(--cat-actinide)', text: '#8b3a4a' }
+            };
+
+            const phaseColors = {
+                solid: { bg: 'var(--phase-solid-card-bg)', text: 'var(--phase-solid-card-text)',
+                border: 'var(--phase-solid-card-border)' },
+                liquid: { bg: 'var(--phase-liquid-card-bg)', text: 'var(--phase-liquid-card-text)',
+                    border: 'var(--phase-liquid-card-border)' },
+                gas: { bg: 'var(--phase-gas-card-bg)', text: 'var(--phase-gas-card-text)', border: 'var(--phase-gas-card-border)' },
+                unknown: { bg: 'var(--phase-unknown-card-bg)', text: 'var(--phase-unknown-card-text)',
+                    border: 'var(--phase-unknown-card-border)' }
+            };
+
+            let currentLang = 'zh';
+            let currentTheme = 'light';
+            let currentTempC = 25;
+            let phaseColorMode = false;
+            const ZERO_KELVIN = 273.15;
+
+            function getPhase(el, tempC) {
+                const tempK = tempC + ZERO_KELVIN;
+                if (el.melt == null || el.boil == null) return 'unknown';
+                if (tempK < el.melt) return 'solid';
+                if (tempK >= el.melt && tempK < el.boil) return 'liquid';
+                return 'gas';
+            }
+
+            function getElementName(el) {
+                return ELEM_NAMES[el.s] ? ELEM_NAMES[el.s][currentLang] || el.s : el.s;
+            }
+
+            function getCategoryLabel(key) {
+                return CATEGORY_NAMES[key] ? CATEGORY_NAMES[key][currentLang] || key : key;
+            }
+
+            function t(key, vars) {
+                const val = UI[currentLang]?.[key] || UI['zh'][key] || key;
+                if (vars) return val.replace(/\{n\}/g, vars.n);
+                return val;
+            }
+
+            function getNameFontSize() {
+                return (currentLang === 'zh' || currentLang === 'zh-tw') ? '1.25em' : '0.85em';
+            }
+
+            function getOxidation(el) {
+                const s = el.s;
+                const mainGroup = {
+                    'H': '-1, +1', 'He': '0', 'Li': '+1', 'Be': '+2', 'B': '+3', 'C': '-4, +2, +4',
+                    'N': '-3, +1, +2, +3, +4, +5', 'O': '-2, -1, +2', 'F': '-1', 'Ne': '0', 'Na': '+1',
+                    'Mg': '+2', 'Al': '+3', 'Si': '-4, +4', 'P': '-3, +3, +5', 'S': '-2, +4, +6',
+                    'Cl': '-1, +1, +3, +5, +7', 'Ar': '0', 'K': '+1', 'Ca': '+2', 'Ga': '+3',
+                    'Ge': '-4, +2, +4', 'As': '-3, +3, +5', 'Se': '-2, +4, +6', 'Br': '-1, +1, +3, +5, +7',
+                    'Kr': '0', 'Rb': '+1', 'Sr': '+2', 'In': '+3', 'Sn': '-4, +2, +4', 'Sb': '-3, +3, +5',
+                    'Te': '-2, +4, +6', 'I': '-1, +1, +3, +5, +7', 'Xe': '0, +2, +4, +6, +8', 'Cs': '+1',
+                    'Ba': '+2', 'Tl': '+1, +3', 'Pb': '-4, +2, +4', 'Bi': '-3, +3, +5', 'Po': '-2, +2, +4, +6',
+                    'At': '-1, +1, +3, +5, +7', 'Rn': '0', 'Fr': '+1', 'Ra': '+2', 'Nh': '+1, +3',
+                    'Fl': '+2, +4', 'Mc': '+3, +5', 'Lv': '-2, +4, +6', 'Ts': '-1, +1, +3, +5, +7', 'Og': '0'
+                };
+                const transition = {
+                    'Sc': '+3', 'Ti': '+2, +3, +4', 'V': '+2, +3, +4, +5', 'Cr': '+2, +3, +6',
+                    'Mn': '+2, +3, +4, +6, +7', 'Fe': '+2, +3, +6', 'Co': '+2, +3, +4', 'Ni': '+2, +3, +4',
+                    'Cu': '+1, +2, +3', 'Zn': '+2', 'Y': '+3', 'Zr': '+4', 'Nb': '+3, +5',
+                    'Mo': '+2, +3, +4, +5, +6', 'Tc': '+4, +7', 'Ru': '+2, +3, +4, +6, +8',
+                    'Rh': '+2, +3, +4', 'Pd': '+2, +4', 'Ag': '+1, +2, +3', 'Cd': '+2', 'Hf': '+4',
+                    'Ta': '+5', 'W': '+2, +3, +4, +5, +6', 'Re': '+1, +2, +3, +4, +5, +6, +7',
+                    'Os': '+2, +3, +4, +6, +8', 'Ir': '+2, +3, +4, +6', 'Pt': '+2, +4, +6',
+                    'Au': '+1, +3, +5', 'Hg': '+1, +2', 'Rf': '+4', 'Db': '+5', 'Sg': '+6', 'Bh': '+7',
+                    'Hs': '+8', 'Mt': '+3, +4, +6', 'Ds': '+2, +4', 'Rg': '+3', 'Cn': '+2'
+                };
+                const lanthAct = {
+                    'La': '+3', 'Ce': '+3, +4', 'Pr': '+3, +4', 'Nd': '+3', 'Pm': '+3', 'Sm': '+2, +3',
+                    'Eu': '+2, +3', 'Gd': '+3', 'Tb': '+3, +4', 'Dy': '+3', 'Ho': '+3', 'Er': '+3',
+                    'Tm': '+2, +3', 'Yb': '+2, +3', 'Lu': '+3', 'Ac': '+3', 'Th': '+4', 'Pa': '+4, +5',
+                    'U': '+3, +4, +5, +6', 'Np': '+3, +4, +5, +6', 'Pu': '+3, +4, +5, +6',
+                    'Am': '+3, +4, +5, +6', 'Cm': '+3', 'Bk': '+3, +4', 'Cf': '+2, +3', 'Es': '+2, +3',
+                    'Fm': '+2, +3', 'Md': '+2, +3', 'No': '+2, +3', 'Lr': '+3'
+                };
+                let raw = '—';
+                if (mainGroup[s]) raw = mainGroup[s];
+                else if (transition[s]) raw = transition[s];
+                else if (lanthAct[s]) raw = lanthAct[s];
+                if (raw === '—' || raw === '0') return raw;
+                const parts = raw.split(', ');
+                return parts.map(p => p).join(', ');
+            }
+
+            function formatEC(ec) {
+                const supMap = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8',
+                    '⁹': '9' };
+                return ec.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, m => {
+                    let n = '';
+                    for (let c of m) n += supMap[c];
+                    return '<sup>' + n + '</sup>';
+                });
+            }
+
+            const periodicTable = document.getElementById('periodicTable');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalDialog = document.getElementById('modalDialog');
+            const modalHeader = document.getElementById('modalHeader');
+            const modalDetails = document.getElementById('modalDetails');
+            const modalElectronConfig = document.getElementById('modalElectronConfig');
+            const atomContainer = document.getElementById('atomContainer');
+            const modalClose = document.getElementById('modalClose');
+            const tempSlider = document.getElementById('tempSlider');
+            const tempValueMain = document.getElementById('tempValueMain');
+            const tempValueSub = document.getElementById('tempValueSub');
+            const phaseColorToggle = document.getElementById('phaseColorToggle');
+            const tempIcon = document.getElementById('tempIcon');
+
+            let allElementCards = [],
+                activeCategory = null,
+                isAnimating = false,
+                lastClickedCard = null;
+
+            let currentRotateX = 0,
+                currentRotateY = 0,
+                targetRotateX = 0,
+                targetRotateY = 0,
+                rafId = null;
+            let desktopModalActive = false;
+
+            let mobileModalActive = false;
+            let mobileRafId = null;
+            let gyroActive = false;
+            let gyroAvailable = false;
+            let gyroBeta0 = null,
+                gyroGamma0 = null;
+            let needGyroCalibration = false;
+            let targetMobileRotateX = 0,
+                targetMobileRotateY = 0;
+            let currentMobileRotateX = 0,
+                currentMobileRotateY = 0;
+            let targetGlareX = 50,
+                targetGlareY = 50;
+            let currentGlareX = 50,
+                currentGlareY = 50;
+            let isTouching = false;
+            let touchGlareX = 50,
+                touchGlareY = 50;
+            let touchTiltX = 0,
+                touchTiltY = 0;
+            let lastScreenOrientation = null;
+
+            const isMobile = () => ('ontouchstart' in window) || window.matchMedia('(pointer: coarse)').matches || window
+                .innerWidth < 700;
+
+            function getTemperatureColor(tempC) {
+                const stops = [{ temp: -273, rgb: [0, 102, 255] }, { temp: 0, rgb: [0, 204, 102] }, { temp: 100,
+                    rgb: [255, 153, 0] }, { temp: 1000, rgb: [255, 51, 0] }, { temp: 6000, rgb: [204, 0, 0] }];
+                const t = Math.max(-273, Math.min(6000, tempC));
+                for (let i = 0; i < stops.length - 1; i++)
+                    if (t >= stops[i].temp && t <= stops[i + 1].temp) {
+                        const f = (t - stops[i].temp) / (stops[i + 1].temp - stops[i].temp);
+                        const r = Math.round(stops[i].rgb[0] + f * (stops[i + 1].rgb[0] - stops[i].rgb[0]));
+                        const g = Math.round(stops[i].rgb[1] + f * (stops[i + 1].rgb[1] - stops[i].rgb[1]));
+                        const b = Math.round(stops[i].rgb[2] + f * (stops[i + 1].rgb[2] - stops[i].rgb[2]));
+                        return `rgb(${r},${g},${b})`;
+                    }
+                return `rgb(204,0,0)`;
+            }
+
+            function updateThermometer(t) {
+                const f = Math.max(0, Math.min(1, (t + 273) / 6273));
+                const l = Math.round(f * 4);
+                const ic = ['fa-thermometer-empty', 'fa-thermometer-quarter', 'fa-thermometer-half',
+                    'fa-thermometer-three-quarters', 'fa-thermometer-full'];
+                tempIcon.innerHTML = `<i class="fas ${ic[l]}"></i>`;
+                tempIcon.style.color = getTemperatureColor(t);
+            }
+
+            function updateSliderThumb(t) {
+                const c = getTemperatureColor(t);
+                const s = document.createElement('style');
+                s.id = 'thumb-color-style';
+                const e = document.getElementById('thumb-color-style');
+                if (e) e.remove();
+                s.textContent =
+                    `.temp-slider::-webkit-slider-thumb{background:${c}!important;border-color:${c}!important}.temp-slider::-moz-range-thumb{background:${c}!important;border-color:${c}!important}`;
+                document.head.appendChild(s);
+            }
+
+            function applyCardStyles() {
+                const t = currentTempC;
+                allElementCards.forEach(c => {
+                    const e = elementsData.find(e => e.n == c.dataset.atomicNumber);
+                    if (!e) return;
+                    const p = getPhase(e, t);
+                    const d = c.querySelector('.phase-dot');
+                    if (d) d.className = `phase-dot ${p}`;
+                    if (phaseColorMode) {
+                        const pc = phaseColors[p];
+                        c.style.setProperty('--card-bg', pc.bg);
+                        c.style.setProperty('--card-text', pc.text);
+                        c.style.setProperty('--card-border-color', pc.border);
+                    } else {
+                        const cfg = categoryConfig[e.cat] || categoryConfig['nonmetal'];
+                        c.style.setProperty('--card-bg', cfg.bg);
+                        c.style.setProperty('--card-text', cfg.text);
+                        c.style.setProperty('--card-border-color', 'transparent');
+                    }
+                });
+            }
+
+            function updateUI() {
+                document.getElementById('headerTitle').innerHTML =
+                    `<span class="icon-dot"></span>${t('header_title')}`;
+                document.getElementById('searchInput').placeholder = t('search_placeholder');
+                document.getElementById('categoryLabel').textContent = t('category_label');
+                document.getElementById('phaseLegendLabel').textContent = t('phase_legend');
+                document.getElementById('phaseSolid').textContent = t('solid');
+                document.getElementById('phaseLiquid').textContent = t('liquid');
+                document.getElementById('phaseGas').textContent = t('gas');
+                document.getElementById('phaseUnknown').textContent = t('unknown');
+                document.getElementById('btnAbsoluteZero').textContent = t('btn_abs_zero');
+                document.getElementById('btnRoomTemp').textContent = t('btn_room');
+                document.getElementById('btnResetTemp').textContent = t('btn_reset');
+                document.getElementById('phaseToggleLabel').textContent = t('phase_toggle');
+                document.querySelectorAll('.legend-chip').forEach(c => {
+                    const k = c.dataset.catKey;
+                    if (k) c.textContent = getCategoryLabel(k);
+                });
+                const rb = document.querySelector('.legend-reset');
+                if (rb) rb.textContent = t('show_all');
+            }
+
+            function updateSlider() {
+                const a = document.querySelector('.lang-btn.active');
+                if (!a) return;
+                const s = document.querySelector('.lang-slider');
+                if (!s) return;
+                const p = s.parentElement;
+                if (getComputedStyle(p).position === 'static') p.style.position = 'relative';
+                s.style.left = a.offsetLeft + 'px';
+                s.style.width = a.offsetWidth + 'px';
+            }
+
+            function updateContent() {
+                const nf = getNameFontSize();
+                allElementCards.forEach(c => {
+                    const e = elementsData.find(e => e.n == c.dataset.atomicNumber);
+                    if (e) {
+                        const nm = getElementName(e);
+                        c.dataset.name = nm;
+                        const ns = c.querySelector('.element-name');
+                        if (ns) { ns.textContent = nm;
+                            ns.style.fontSize = nf; }
+                    }
+                });
+                document.querySelectorAll('.legend-chip').forEach(c => {
+                    const k = c.dataset.catKey;
+                    if (k) c.textContent = getCategoryLabel(k);
+                });
+                updateUI();
+                searchInput.dispatchEvent(new Event('input'));
+            }
+
+            function switchLang(l) {
+                if (l === currentLang) return;
+                currentLang = l;
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang ===
+                    l));
+                updateSlider();
+                updateContent();
+            }
+
+            function buildLegend() {
+                const le = document.getElementById('legend');
+                le.innerHTML = `<span class="legend-label" id="categoryLabel">${t('category_label')}</span>`;
+                Object.entries(categoryConfig).forEach(([k]) => {
+                    const ch = document.createElement('button');
+                    ch.className = 'legend-chip';
+                    ch.dataset.catKey = k;
+                    ch.textContent = getCategoryLabel(k);
+                    const cfg = categoryConfig[k];
+                    ch.style.background = cfg.bg;
+                    ch.style.color = cfg.text;
+                    ch.addEventListener('click', () => {
+                        if (activeCategory === k) {
+                            activeCategory = null;
+                            ch.classList.remove('active');
+                        } else {
+                            activeCategory = k;
+                            document.querySelectorAll('.legend-chip').forEach(c => c.classList.remove(
+                                'active'));
+                            ch.classList.add('active');
+                        }
+                        searchInput.dispatchEvent(new Event('input'));
+                    });
+                    le.appendChild(ch);
+                });
+                const rb = document.createElement('button');
+                rb.className = 'legend-reset';
+                rb.textContent = t('show_all');
+                rb.addEventListener('click', () => {
+                    activeCategory = null;
+                    document.querySelectorAll('.legend-chip').forEach(c => c.classList.remove('active'));
+                    searchInput.dispatchEvent(new Event('input'));
+                });
+                le.appendChild(rb);
+            }
+
+            function buildTable() {
+                periodicTable.innerHTML = '';
+                allElementCards = [];
+                const map = {};
+                elementsData.forEach(e => map[`${e.p}-${e.g}`] = e);
+                const nf = getNameFontSize();
+                for (let p = 1; p <= 9; p++)
+                    for (let g = 1; g <= 18; g++) {
+                        const el = map[`${p}-${g}`];
+                        if (el) {
+                            const c = document.createElement('div');
+                            c.className = 'element-card';
+                            c.tabIndex = 0;
+                            c.dataset.atomicNumber = el.n;
+                            c.dataset.symbol = el.s;
+                            const nm = getElementName(el);
+                            c.dataset.name = nm;
+                            c.dataset.category = el.cat;
+                            c.style.gridRow = p;
+                            c.style.gridColumn = g;
+                            c.innerHTML =
+                                `<span class="atomic-number">${el.n}</span><span class="symbol">${el.s}</span><span class="element-name">${nm}</span><span class="atomic-mass">${el.mass}</span><span class="phase-dot solid"></span>`;
+                            c.querySelector('.element-name').style.fontSize = nf;
+                            c.addEventListener('click', () => { lastClickedCard = c;
+                                openModal(el); });
+                            c.addEventListener('keydown', e => {
+                                if (e.key === 'Enter') { e.preventDefault();
+                                    lastClickedCard = c;
+                                    openModal(el); }
+                            });
+                            periodicTable.appendChild(c);
+                            allElementCards.push(c);
+                        } else if ((p >= 1 && p <= 7) || (p >= 8 && p <= 9 && g >= 3 && g <= 17)) {
+                            const e = document.createElement('div');
+                            e.className = 'empty-slot';
+                            e.style.gridRow = p;
+                            e.style.gridColumn = g;
+                            periodicTable.appendChild(e);
+                        }
+                    }
+                ['镧系', '锕系'].forEach((t, i) => {
+                    const l = document.createElement('div');
+                    l.className = 'series-separator';
+                    l.style.gridRow = 8 + i;
+                    l.style.gridColumn = '1/3';
+                    l.textContent = t;
+                    periodicTable.appendChild(l);
+                });
+                applyCardStyles();
+                buildLegend();
+                updateUI();
+                requestAnimationFrame(() => updateSlider());
+            }
+
+            function handleOrientation(e) {
+                if (!mobileModalActive) return;
+                let gamma = e.gamma;
+                let beta = e.beta;
+                if (gamma == null || beta == null) return;
+
+                const orientation = screen.orientation?.type || '';
+                const isLandscape = orientation.startsWith('landscape');
+                const currentOrientation = isLandscape ? 'landscape' : 'portrait';
+
+                if (lastScreenOrientation !== null && lastScreenOrientation !== currentOrientation) {
+                    needGyroCalibration = true;
+                }
+                lastScreenOrientation = currentOrientation;
+
+                if (isLandscape) {
+                    [gamma, beta] = [beta, gamma];
+                    gamma = -gamma;
+                }
+
+                if (needGyroCalibration) {
+                    gyroBeta0 = beta;
+                    gyroGamma0 = gamma;
+                    needGyroCalibration = false;
+                    gyroAvailable = true;
+                    targetMobileRotateX = 0;
+                    targetMobileRotateY = 0;
+                    targetGlareX = 50;
+                    targetGlareY = 50;
+                    return;
+                }
+
+                if (gyroBeta0 == null || gyroGamma0 == null) return;
+                gyroAvailable = true;
+
+                const deltaBeta = beta - gyroBeta0;
+                const deltaGamma = gamma - gyroGamma0;
+                const maxTilt = 18;
+                targetMobileRotateX = Math.max(-maxTilt, Math.min(maxTilt, deltaBeta * 1.0));
+                targetMobileRotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaGamma * 1.0));
+
+                if (!isTouching) {
+                    targetGlareX = 50 + deltaGamma * 1.0;
+                    targetGlareY = 50 + deltaBeta * 1.0;
+                    targetGlareX = Math.max(5, Math.min(95, targetGlareX));
+                    targetGlareY = Math.max(5, Math.min(95, targetGlareY));
+                }
+            }
+
+            function enableGyro() {
+                if (gyroActive) return;
+                if (typeof DeviceOrientationEvent !== 'undefined') {
+                    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        DeviceOrientationEvent.requestPermission().then(state => {
+                            if (state === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                                gyroActive = true;
+                            }
+                        }).catch(() => {});
+                    } else {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                        gyroActive = true;
+                    }
+                }
+            }
+
+            function handleModalTouchStart(e) {
+                if (!mobileModalActive) return;
+                isTouching = true;
+                if (e.touches.length === 1) {
+                    updateTouchPosition(e.touches[0]);
+                }
+            }
+
+            function handleModalTouchMove(e) {
+                if (!mobileModalActive || !isTouching) return;
+                if (e.touches.length === 1) {
+                    updateTouchPosition(e.touches[0]);
+                }
+            }
+
+            function handleModalTouchEnd(e) {
+                if (!mobileModalActive) return;
+                isTouching = false;
+                if (!gyroAvailable) {
+                    targetMobileRotateX = 0;
+                    targetMobileRotateY = 0;
+                    targetGlareX = 50;
+                    targetGlareY = 50;
+                }
+            }
+
+            function updateTouchPosition(touch) {
+                const r = modalDialog.getBoundingClientRect();
+                const x = touch.clientX - r.left;
+                const y = touch.clientY - r.top;
+                const hw = r.width / 2;
+                const hh = r.height / 2;
+                const fx = (x - hw) / hw;
+                const fy = (y - hh) / hh;
+
+                touchGlareX = (x / r.width) * 100;
+                touchGlareY = (y / r.height) * 100;
+                touchGlareX = Math.max(5, Math.min(95, touchGlareX));
+                touchGlareY = Math.max(5, Math.min(95, touchGlareY));
+                targetGlareX = touchGlareX;
+                targetGlareY = touchGlareY;
+
+                if (!gyroAvailable) {
+                    touchTiltX = -fy * 18;
+                    touchTiltY = fx * 18;
+                    targetMobileRotateX = touchTiltX;
+                    targetMobileRotateY = touchTiltY;
+                }
+            }
+
+            function animateMobileTilt() {
+                if (!mobileModalActive) { mobileRafId = null; return; }
+                const lf = 0.14;
+                currentMobileRotateX += (targetMobileRotateX - currentMobileRotateX) * lf;
+                currentMobileRotateY += (targetMobileRotateY - currentMobileRotateY) * lf;
+                currentGlareX += (targetGlareX - currentGlareX) * lf;
+                currentGlareY += (targetGlareY - currentGlareY) * lf;
+
+                if (Math.abs(targetMobileRotateX - currentMobileRotateX) < 0.005 && Math.abs(targetMobileRotateY -
+                        currentMobileRotateY) < 0.005) {
+                    currentMobileRotateX = targetMobileRotateX;
+                    currentMobileRotateY = targetMobileRotateY;
+                }
+                if (Math.abs(targetGlareX - currentGlareX) < 0.05 && Math.abs(targetGlareY - currentGlareY) < 0.05) {
+                    currentGlareX = targetGlareX;
+                    currentGlareY = targetGlareY;
+                }
+
+                modalDialog.style.transform =
+                    `rotateX(${currentMobileRotateX.toFixed(2)}deg) rotateY(${currentMobileRotateY.toFixed(2)}deg)`;
+                modalDialog.style.setProperty('--pointer-x', `${currentGlareX.toFixed(1)}%`);
+                modalDialog.style.setProperty('--pointer-y', `${currentGlareY.toFixed(1)}%`);
+                modalDialog.style.setProperty('--pointer-from-left', Math.max(0, Math.min(1, currentGlareX / 100)));
+                modalDialog.style.setProperty('--pointer-from-top', Math.max(0, Math.min(1, currentGlareY / 100)));
+                modalDialog.style.setProperty('--glare-opacity', (isTouching || gyroAvailable) ? '0.7' : '0.25');
+
+                mobileRafId = requestAnimationFrame(animateMobileTilt);
+            }
+
+            function handleModalMouseMove(e) {
+                if (!desktopModalActive) return;
+                const r = modalDialog.getBoundingClientRect();
+                const x = e.clientX - r.left,
+                    y = e.clientY - r.top;
+                const hw = r.width / 2,
+                    hh = r.height / 2;
+                const fx = (x - hw) / hw,
+                    fy = (y - hh) / hh;
+                targetRotateX = -fy * 12;
+                targetRotateY = fx * 12;
+                const px = (x / r.width) * 100,
+                    py = (y / r.height) * 100;
+                modalDialog.style.setProperty('--pointer-x', `${Math.max(0,Math.min(100,px))}%`);
+                modalDialog.style.setProperty('--pointer-y', `${Math.max(0,Math.min(100,py))}%`);
+                modalDialog.style.setProperty('--pointer-from-left', Math.max(0, Math.min(1, px / 100)));
+                modalDialog.style.setProperty('--pointer-from-top', Math.max(0, Math.min(1, py / 100)));
+                modalDialog.style.setProperty('--glare-opacity', '0.7');
+            }
+
+            function handleModalMouseLeave() {
+                if (!desktopModalActive) return;
+                targetRotateX = targetRotateY = 0;
+                modalDialog.style.setProperty('--pointer-x', '50%');
+                modalDialog.style.setProperty('--pointer-y', '50%');
+                modalDialog.style.setProperty('--pointer-from-left', '0.5');
+                modalDialog.style.setProperty('--pointer-from-top', '0.5');
+                modalDialog.style.setProperty('--glare-opacity', '0');
+            }
+
+            function animateModalTilt() {
+                if (!desktopModalActive) { rafId = null; return; }
+                const lf = 0.12;
+                currentRotateX += (targetRotateX - currentRotateX) * lf;
+                currentRotateY += (targetRotateY - currentRotateY) * lf;
+                if (Math.abs(targetRotateX - currentRotateX) < 0.005 && Math.abs(targetRotateY - currentRotateY) <
+                    0.005) {
+                    currentRotateX = targetRotateX;
+                    currentRotateY = targetRotateY;
+                }
+                modalDialog.style.transform =
+                    `rotateX(${currentRotateX.toFixed(2)}deg) rotateY(${currentRotateY.toFixed(2)}deg)`;
+                rafId = requestAnimationFrame(animateModalTilt);
+            }
+
+            function openModal(el) {
+                if (isAnimating) return;
+                isAnimating = true;
+                const cfg = categoryConfig[el.cat] || categoryConfig['nonmetal'];
+                const phase = getPhase(el, currentTempC);
+                const pt = { solid: t('solid'), liquid: t('liquid'), gas: t('gas'), unknown: t('unknown') };
+                const oxidation = getOxidation(el);
+                modalHeader.innerHTML =
+                    `<div class="modal-symbol-badge" style="background:${cfg.bg};color:${cfg.text}">${el.s}</div><div class="modal-element-title"><span class="modal-element-name">${getElementName(el)} (${el.s})</span><span class="modal-element-category">${getCategoryLabel(el.cat)}</span></div>`;
+                modalDetails.innerHTML =
+                    `<div class="modal-detail-item"><span>${t('modal_atomic')}</span><strong>${el.n}</strong></div><div class="modal-detail-item"><span>${t('modal_mass')}</span><strong>${el.mass}</strong></div><div class="modal-detail-item"><span>${t('modal_state')}</span><strong>${pt[phase]}</strong></div><div class="modal-detail-item"><span>${t('modal_melt')}</span><strong>${el.melt?(el.melt-ZERO_KELVIN).toFixed(1)+'°C':t('unknown')}</strong></div><div class="modal-detail-item"><span>${t('modal_boil')}</span><strong>${el.boil?(el.boil-ZERO_KELVIN).toFixed(1)+'°C':t('unknown')}</strong></div><div class="modal-detail-item"><span>${t('modal_en')}</span><strong>${el.en}</strong></div><div class="modal-detail-item"><span>${t('modal_radius')}</span><strong>${el.radius?el.radius+' pm':t('unknown')}</strong></div><div class="modal-detail-item"><span>${t('modal_density')}</span><strong>${el.density?el.density+' g/cm³':t('unknown')}</strong></div><div class="modal-detail-item"><span>${t('modal_year')}</span><strong>${el.year?el.year:t('unknown')}</strong></div><div class="modal-detail-item"><span>${t('modal_oxidation')}</span><strong>${oxidation}</strong></div>`;
+                modalElectronConfig.innerHTML =
+                    `<span style="font-weight:600;font-size:0.6rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;">${t('modal_config')}</span> ${formatEC(el.ec)}`;
+                atomContainer.innerHTML = generateAtomSVG(el);
+
+                currentRotateX = currentRotateY = targetRotateX = targetRotateY = 0;
+                currentMobileRotateX = currentMobileRotateY = targetMobileRotateX = targetMobileRotateY = 0;
+                currentGlareX = currentGlareY = targetGlareX = targetGlareY = 50;
+                touchGlareX = touchGlareY = 50;
+                touchTiltX = touchTiltY = 0;
+                isTouching = false;
+                gyroBeta0 = gyroGamma0 = null;
+                gyroAvailable = false;
+                needGyroCalibration = false;
+                lastScreenOrientation = null;
+                modalDialog.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                ['--pointer-x', '--pointer-y'].forEach(v => modalDialog.style.setProperty(v, '50%'));
+                modalDialog.style.setProperty('--pointer-from-left', '0.5');
+                modalDialog.style.setProperty('--pointer-from-top', '0.5');
+                modalDialog.style.setProperty('--glare-opacity', '0');
+
+                modalOverlay.classList.add('active');
+                modalDialog.classList.add('bouncing-in');
+                modalOverlay.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+
+                const onEnd = () => {
+                    modalDialog.removeEventListener('animationend', onEnd);
+                    modalDialog.classList.remove('bouncing-in');
+                    isAnimating = false;
+                    modalClose.focus();
+                };
+                modalDialog.addEventListener('animationend', onEnd, { once: true });
+                setTimeout(() => { if (isAnimating) onEnd(); }, 600);
+
+                modalDialog.removeEventListener('mousemove', handleModalMouseMove);
+                modalDialog.removeEventListener('mouseleave', handleModalMouseLeave);
+                modalOverlay.removeEventListener('touchstart', handleModalTouchStart);
+                modalOverlay.removeEventListener('touchmove', handleModalTouchMove);
+                modalOverlay.removeEventListener('touchend', handleModalTouchEnd);
+                modalOverlay.removeEventListener('touchcancel', handleModalTouchEnd);
+                if (rafId) { cancelAnimationFrame(rafId);
+                    rafId = null; }
+                if (mobileRafId) { cancelAnimationFrame(mobileRafId);
+                    mobileRafId = null; }
+
+                if (!isMobile()) {
+                    desktopModalActive = true;
+                    mobileModalActive = false;
+                    modalDialog.addEventListener('mousemove', handleModalMouseMove);
+                    modalDialog.addEventListener('mouseleave', handleModalMouseLeave);
+                    rafId = requestAnimationFrame(animateModalTilt);
+                } else {
+                    desktopModalActive = false;
+                    mobileModalActive = true;
+                    needGyroCalibration = true;
+                    modalOverlay.addEventListener('touchstart', handleModalTouchStart, { passive: true });
+                    modalOverlay.addEventListener('touchmove', handleModalTouchMove, { passive: true });
+                    modalOverlay.addEventListener('touchend', handleModalTouchEnd, { passive: true });
+                    modalOverlay.addEventListener('touchcancel', handleModalTouchEnd, { passive: true });
+                    mobileRafId = requestAnimationFrame(animateMobileTilt);
+                    if (!gyroActive) enableGyro();
+                }
+            }
+
+            function closeModal() {
+                if (isAnimating) return;
+                isAnimating = true;
+                modalOverlay.classList.remove('active');
+                modalOverlay.setAttribute('aria-hidden', 'true');
+                modalDialog.classList.remove('bouncing-in');
+                document.body.style.overflow = '';
+
+                desktopModalActive = false;
+                mobileModalActive = false;
+                isTouching = false;
+                if (rafId) { cancelAnimationFrame(rafId);
+                    rafId = null; }
+                if (mobileRafId) { cancelAnimationFrame(mobileRafId);
+                    mobileRafId = null; }
+                modalDialog.removeEventListener('mousemove', handleModalMouseMove);
+                modalDialog.removeEventListener('mouseleave', handleModalMouseLeave);
+                modalOverlay.removeEventListener('touchstart', handleModalTouchStart);
+                modalOverlay.removeEventListener('touchmove', handleModalTouchMove);
+                modalOverlay.removeEventListener('touchend', handleModalTouchEnd);
+                modalOverlay.removeEventListener('touchcancel', handleModalTouchEnd);
+
+                currentRotateX = currentRotateY = targetRotateX = targetRotateY = 0;
+                currentMobileRotateX = currentMobileRotateY = targetMobileRotateX = targetMobileRotateY = 0;
+                currentGlareX = currentGlareY = targetGlareX = targetGlareY = 50;
+                gyroBeta0 = gyroGamma0 = null;
+                gyroAvailable = false;
+                needGyroCalibration = false;
+                lastScreenOrientation = null;
+                modalDialog.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                ['--pointer-x', '--pointer-y'].forEach(v => modalDialog.style.setProperty(v, '50%'));
+                modalDialog.style.setProperty('--pointer-from-left', '0.5');
+                modalDialog.style.setProperty('--pointer-from-top', '0.5');
+                modalDialog.style.setProperty('--glare-opacity', '0');
+
+                isAnimating = false;
+                if (lastClickedCard) lastClickedCard.focus();
+            }
+
+            function generateAtomSVG(el) {
+                const shells = getElectronShells(el.n);
+                const color = (categoryConfig[el.cat] || categoryConfig['nonmetal']).text || '#3a528b';
+                const br = 75,
+                    st = 55;
+                const mr = br + shells.length * st;
+                const ss = mr + 40;
+                let o = '';
+                shells.forEach((c, i) => {
+                    const r = br + i * st;
+                    const oc = `orbit orbit-${i+1}`;
+                    let e = '';
+                    if (c > 0) {
+                        const as = 360 / c;
+                        for (let j = 0; j < c; j++) {
+                            const a = j * as * Math.PI / 180;
+                            const cx = r * Math.cos(a),
+                                cy = r * Math.sin(a);
+                            e +=
+                                `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${Math.max(6, 10 - i * 0.6)}" fill="${color}" />`;
+                        }
+                    }
+                    o +=
+                        `<g class="${oc}"><circle cx="0" cy="0" r="${r}" fill="none" stroke="${color}" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>${e}</g>`;
+                });
+                return `<svg class="atom-svg" viewBox="${-ss} ${-ss} ${ss*2} ${ss*2}"><circle cx="0" cy="0" r="40" fill="${color}" opacity="0.1"/><circle cx="0" cy="0" r="40" fill="none" stroke="${color}" stroke-width="3"/><text x="0" y="0" text-anchor="middle" dominant-baseline="middle" font-size="28" font-weight="700" fill="${color}">${el.s}</text>${o}</svg>`;
+            }
+
+            function getElectronShells(an) {
+                const order = [{ n: 1, l: 's', cap: 2 }, { n: 2, l: 's', cap: 2 }, { n: 2, l: 'p', cap: 6 }, { n: 3, l: 's',
+                    cap: 2 }, { n: 3, l: 'p', cap: 6 }, { n: 4, l: 's', cap: 2 }, { n: 3, l: 'd', cap: 10 }, { n: 4,
+                    l: 'p', cap: 6 }, { n: 5, l: 's', cap: 2 }, { n: 4, l: 'd', cap: 10 }, { n: 5, l: 'p', cap: 6 }, { n: 6,
+                    l: 's', cap: 2 }, { n: 4, l: 'f', cap: 14 }, { n: 5, l: 'd', cap: 10 }, { n: 6, l: 'p', cap: 6 }, { n: 7,
+                    l: 's', cap: 2 }, { n: 5, l: 'f', cap: 14 }, { n: 6, l: 'd', cap: 10 }, { n: 7, l: 'p', cap: 6 }];
+                let r = an;
+                const s = [0, 0, 0, 0, 0, 0, 0];
+                for (let o of order) {
+                    if (r <= 0) break;
+                    const f = Math.min(o.cap, r);
+                    s[o.n - 1] += f;
+                    r -= f;
+                }
+                while (s.length > 0 && s[s.length - 1] === 0) s.pop();
+                return s;
+            }
+
+            function updateTempDisplay() {
+                const c = getTemperatureColor(currentTempC);
+                tempValueMain.innerHTML = `<span style="color:${c}">${currentTempC}</span>°C`;
+                tempValueSub.innerHTML = `<span style="color:${c}">${(currentTempC + ZERO_KELVIN).toFixed(0)}</span> K`;
+                updateThermometer(currentTempC);
+                updateSliderThumb(currentTempC);
+            }
+
+            function updateTheme(th) {
+                currentTheme = th;
+                document.documentElement.setAttribute('data-theme', th === 'dark' ? 'dark' : '');
+                document.getElementById('themeToggle').textContent = th === 'dark' ? '☀️' : '🌙';
+                if (phaseColorMode) applyCardStyles();
+            }
+
+            function init() {
+                updateTheme('light');
+                updateTempDisplay();
+                buildTable();
+                requestAnimationFrame(() => updateSlider());
+                window.addEventListener('resize', () => { requestAnimationFrame(updateSlider); });
+                phaseColorToggle.addEventListener('click', () => {
+                    phaseColorMode = !phaseColorMode;
+                    phaseColorToggle.classList.toggle('active', phaseColorMode);
+                    applyCardStyles();
+                });
+                tempSlider.addEventListener('input', () => {
+                    currentTempC = parseInt(tempSlider.value);
+                    updateTempDisplay();
+                    applyCardStyles();
+                });
+                document.getElementById('btnAbsoluteZero').addEventListener('click', () => {
+                    currentTempC = -273;
+                    tempSlider.value = currentTempC;
+                    updateTempDisplay();
+                    applyCardStyles();
+                });
+                document.getElementById('btnRoomTemp').addEventListener('click', () => {
+                    currentTempC = 25;
+                    tempSlider.value = currentTempC;
+                    updateTempDisplay();
+                    applyCardStyles();
+                });
+                document.getElementById('btnResetTemp').addEventListener('click', () => {
+                    currentTempC = 25;
+                    tempSlider.value = currentTempC;
+                    updateTempDisplay();
+                    applyCardStyles();
+                });
+                document.querySelectorAll('.lang-btn').forEach(b => {
+                    b.addEventListener('click', () => { switchLang(b.dataset.lang); });
+                });
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    updateTheme(currentTheme === 'light' ? 'dark' : 'light');
+                });
+                modalClose.addEventListener('click', closeModal);
+                modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains(
+                        'active')) closeModal(); });
+                const searchInput = document.getElementById('searchInput');
+                const searchClear = document.getElementById('searchClear');
+                const resultsCount = document.getElementById('resultsCount');
+                searchInput.addEventListener('input', () => {
+                    const q = searchInput.value.trim().toLowerCase();
+                    if (!q && !activeCategory) {
+                        allElementCards.forEach(c => c.classList.remove('dimmed', 'highlighted'));
+                        searchClear.classList.remove('visible');
+                        resultsCount.classList.remove('visible');
+                        return;
+                    }
+                    searchClear.classList.toggle('visible', !!q);
+                    let cnt = 0;
+                    allElementCards.forEach(c => {
+                        const nm = c.dataset.name.toLowerCase(),
+                            sy = c.dataset.symbol.toLowerCase(),
+                            nu = c.dataset.atomicNumber;
+                        const m = !q || nm.includes(q) || sy.includes(q) || nu === q;
+                        const ok = !activeCategory || c.dataset.category === activeCategory;
+                        const sh = m && ok;
+                        c.classList.toggle('dimmed', !sh);
+                        c.classList.toggle('highlighted', sh && !!activeCategory);
+                        if (sh) cnt++;
+                    });
+                    resultsCount.textContent = t('search_count', { n: cnt });
+                    resultsCount.classList.toggle('visible', !!(q || activeCategory));
+                });
+                searchClear.addEventListener('click', () => {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                });
+            }
+            init();
+        })();
+    </script>
 </body>
 </html>
