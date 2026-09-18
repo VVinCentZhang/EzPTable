@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, viewport-fit=cover">
-    <title>元素周期表 · 新拟态+玻璃</title>
+    <title>EzPTable</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -1176,6 +1176,7 @@
             const UI = {
                 'zh': {
                     'header_title': '元素周期表',
+                    'page_title': '元素周期表·新拟态',
                     'search_placeholder': '搜索元素...',
                     'category_label': '分类：',
                     'phase_legend': '● 物态',
@@ -1203,6 +1204,7 @@
                 },
                 'zh-tw': {
                     'header_title': '元素週期表',
+                    'page_title': '元素週期表·新擬態',
                     'search_placeholder': '搜尋元素...',
                     'category_label': '分類：',
                     'phase_legend': '● 物態',
@@ -1230,6 +1232,7 @@
                 },
                 'en': {
                     'header_title': 'Periodic Table',
+                    'page_title': 'Periodic Table · Neumorphism',
                     'search_placeholder': 'Search elements...',
                     'category_label': 'Category:',
                     'phase_legend': '● State',
@@ -1257,6 +1260,7 @@
                 },
                 'ja': {
                     'header_title': '周期表',
+                    'page_title': '周期表 · ニューモーフィズム',
                     'search_placeholder': '元素を検索...',
                     'category_label': 'カテゴリ：',
                     'phase_legend': '● 状態',
@@ -1762,6 +1766,18 @@
             let phaseColorMode = false;
             const ZERO_KELVIN = 273.15;
 
+            function detectBrowserLang() {
+                const langs = navigator.languages || [navigator.language || 'en'];
+                for (const raw of langs) {
+                    const l = raw.toLowerCase();
+                    if (l.startsWith('zh-tw') || l.startsWith('zh-hk') || l.startsWith('zh-hant')) return 'zh-tw';
+                    if (l.startsWith('zh')) return 'zh';
+                    if (l.startsWith('ja')) return 'ja';
+                    if (l.startsWith('en')) return 'en';
+                }
+                return 'en';
+            }
+
             function getPhase(el, tempC) {
                 const tempK = tempC + ZERO_KELVIN;
                 if (el.melt == null || el.boil == null) return 'unknown';
@@ -1949,6 +1965,7 @@
             }
 
             function updateUI() {
+                document.title = t('page_title');
                 document.getElementById('headerTitle').innerHTML =
                     `<span class="icon-dot"></span>${t('header_title')}`;
                 document.getElementById('searchInput').placeholder = t('search_placeholder');
@@ -2466,6 +2483,10 @@
             }
 
             function init() {
+                currentLang = detectBrowserLang();
+                document.querySelectorAll('.lang-btn').forEach(b =>
+                    b.classList.toggle('active', b.dataset.lang === currentLang)
+                );
                 updateTheme('light');
                 updateTempDisplay();
                 buildTable();
