@@ -320,16 +320,24 @@
         [data-theme="dark"] .lang-btn:hover:not(.active) {
             color: #fff;
         }
+
+        /* ============================================================
+           主题切换按钮（太阳 / 月亮 旋转动画）
+           ============================================================ */
         .theme-btn {
             background: transparent;
             border: none;
-            border-radius: 30px;
-            padding: 4px 10px;
-            font-size: 1rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            padding: 0;
             cursor: pointer;
             color: var(--text-secondary);
-            transition: all 0.3s;
-            line-height: 1.6;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            transition: color 0.3s, transform 0.3s;
+            line-height: 1;
             position: relative;
             z-index: 1;
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
@@ -339,11 +347,56 @@
             color: var(--text);
             transform: scale(1.1);
         }
+        .theme-btn:active {
+            transform: scale(0.94);
+        }
         [data-theme="dark"] .theme-btn {
             color: rgba(255, 255, 255, 0.7);
         }
         [data-theme="dark"] .theme-btn:hover {
             color: #fff;
+        }
+
+        /* 两个图标叠在同一个网格单元里 */
+        .theme-btn svg {
+            width: 18px;
+            height: 18px;
+            grid-area: 1 / 1;
+            transform-origin: 50% 50%;
+            will-change: transform, opacity;
+        }
+
+        /* ---- 日间模式：太阳在位，月亮待机 ---- */
+        html:not([data-theme="dark"]) .theme-btn .icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+            /* 延迟出场：等月亮先转走，再顺时针转回来 */
+            transition: opacity .2s ease .2s,
+                        transform .55s cubic-bezier(.34, 1.56, .64, 1) .2s;
+        }
+        html:not([data-theme="dark"]) .theme-btn .icon-moon {
+            opacity: 0;
+            transform: rotate(90deg) scale(.3);   /* 待机位：逆时针方向 +90° */
+            transition: opacity .2s ease,
+                        transform .28s ease;
+        }
+
+        /* ---- 夜间模式：月亮在位，太阳待机 ---- */
+        html[data-theme="dark"] .theme-btn .icon-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+            transition: opacity .2s ease .2s,
+                        transform .55s cubic-bezier(.34, 1.56, .64, 1) .2s;
+        }
+        html[data-theme="dark"] .theme-btn .icon-sun {
+            opacity: 0;
+            transform: rotate(-90deg) scale(.3);  /* 待机位：顺时针方向 -90° */
+            transition: opacity .2s ease,
+                        transform .28s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .theme-btn svg { transition: none !important; }
         }
 
         /* ============================================================
@@ -1836,6 +1889,30 @@
             transform: scale(1.08);
         }
 
+        /* ============================================================
+           主题切换：圆形扩散动画
+           ============================================================ */
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none;
+            mix-blend-mode: normal;
+        }
+        ::view-transition-old(root) { z-index: 1; }
+        ::view-transition-new(root) { z-index: 2; }
+
+        .theme-mask {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            pointer-events: none;
+            clip-path: circle(0px at var(--x, 50%) var(--y, 50%));
+            transition: clip-path .55s cubic-bezier(.4, 0, .2, 1);
+            will-change: clip-path;
+        }
+        .theme-mask.active {
+            clip-path: circle(var(--r, 150vmax) at var(--x, 50%) var(--y, 50%));
+        }
+
         @media (max-width: 700px) {
             :root { --card-size: 38px; }
             .modal-dialog { width: 92vw; max-height: 90vh; }
@@ -1849,6 +1926,8 @@
             .element-card { font-size: clamp(8px, calc(var(--card-size)/4.5), 14px); }
             .header-actions { gap: 8px; }
             .lang-btn { padding: 2px 10px; font-size: 0.6rem; }
+            .theme-btn { width: 30px; height: 30px; }
+            .theme-btn svg { width: 16px; height: 16px; }
             .search-input { width: 140px; font-size: 0.75rem; padding: 8px 14px 8px 32px; }
             .search-input:focus-visible { width: 170px; }
             .temp-btn { padding: 6px 12px; font-size: 0.6rem; }
@@ -1877,6 +1956,12 @@
                 --sl-size: 36px;
                 --sl-svg: 240px;
             }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            ::view-transition-old(root),
+            ::view-transition-new(root) { animation: none !important; }
+            .theme-mask { transition: none !important; }
         }
     </style>
 </head>
@@ -1926,7 +2011,20 @@
                     <button class="lang-btn" data-lang="zh-tw">繁</button>
                     <button class="lang-btn" data-lang="en">EN</button>
                     <button class="lang-btn" data-lang="ja">日</button>
-                    <button class="theme-btn" id="themeToggle" title="切换夜间模式">🌙</button>
+                    <button class="theme-btn" id="themeToggle" title="切换夜间模式" aria-label="切换深浅配色">
+                        <!-- 月亮 -->
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+                        </svg>
+                        <!-- 太阳 -->
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4.5"/>
+                            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2
+                                     M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19"/>
+                        </svg>
+                    </button>
                 </div>
                 <div class="sling-button" id="slingButton">
                     <svg class="sling-button__fx" viewBox="-140 -140 280 280" aria-hidden="true">
@@ -3093,8 +3191,105 @@
             function updateTheme(th) {
                 currentTheme = th;
                 document.documentElement.setAttribute('data-theme', th === 'dark' ? 'dark' : '');
-                document.getElementById('themeToggle').textContent = th === 'dark' ? '☀️' : '🌙';
+                // 图标切换完全由 CSS 依据 data-theme 驱动：
+                // 日间 → 太阳顺时针转回；夜间 → 月亮逆时针转出。
+                // 这里只同步无障碍标签和提示文案。
+                const themeBtn = document.getElementById('themeToggle');
+                if (themeBtn) {
+                    const label = th === 'dark' ? '切换到日间模式' : '切换到夜间模式';
+                    themeBtn.setAttribute('title', label);
+                    themeBtn.setAttribute('aria-label', label);
+                }
                 if (phaseColorMode) applyCardStyles();
+            }
+
+            /* ============================================================
+               主题切换：圆形扩散动画
+               ============================================================ */
+            function getCircleParams(el) {
+                const rect = el.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                // 从圆心到视口最远角的距离，保证圆能铺满全屏
+                const r = Math.hypot(
+                    Math.max(x, window.innerWidth - x),
+                    Math.max(y, window.innerHeight - y)
+                );
+                return { x, y, r };
+            }
+
+            /* 降级方案：手动遮罩 + clip-path 过渡 */
+            function fallbackThemeTransition(theme, x, y, r) {
+                const mask = document.createElement('div');
+                mask.className = 'theme-mask';
+                mask.style.setProperty('--x', x + 'px');
+                mask.style.setProperty('--y', y + 'px');
+                mask.style.setProperty('--r', r + 'px');
+                // 遮罩颜色 = 目标主题的表面色
+                mask.style.background = theme === 'dark' ? '#1e1e1e' : '#E7E5E4';
+
+                document.body.appendChild(mask);
+
+                // 下一帧再加 active，确保过渡能被触发
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => mask.classList.add('active'));
+                });
+
+                mask.addEventListener('transitionend', function onEnd(e) {
+                    if (e.propertyName !== 'clip-path') return;
+                    mask.removeEventListener('transitionend', onEnd);
+
+                    // 遮罩已铺满 → 此刻切换主题，用户看不到突变
+                    updateTheme(theme);
+
+                    // 淡出遮罩，露出新主题
+                    mask.style.transition = 'opacity .28s ease';
+                    mask.style.opacity = '0';
+                    setTimeout(() => mask.remove(), 320);
+                });
+            }
+
+            /* 主题切换主逻辑 */
+            function toggleThemeWithCircle(btn) {
+                const next = currentTheme === 'dark' ? 'light' : 'dark';
+                const reduced = window.matchMedia &&
+                                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                // 用户要求减弱动效 → 直接切换
+                if (reduced) {
+                    updateTheme(next);
+                    return;
+                }
+
+                const { x, y, r } = getCircleParams(btn);
+
+                // 不支持 View Transitions → 降级
+                if (!document.startViewTransition) {
+                    fallbackThemeTransition(next, x, y, r);
+                    return;
+                }
+
+                // ① 启动视图过渡，在回调里真正切换主题
+                const transition = document.startViewTransition(() => {
+                    updateTheme(next);
+                });
+
+                // ② 等新快照准备好，给它做圆形扩散动画
+                transition.ready.then(() => {
+                    document.documentElement.animate(
+                        {
+                            clipPath: [
+                                `circle(0px at ${x}px ${y}px)`,
+                                `circle(${r}px at ${x}px ${y}px)`
+                            ]
+                        },
+                        {
+                            duration: 520,
+                            easing: 'cubic-bezier(.4, 0, .2, 1)',
+                            pseudoElement: '::view-transition-new(root)'
+                        }
+                    );
+                }).catch(() => {});
             }
 
             /* ============================================================
@@ -3928,8 +4123,9 @@
                 document.querySelectorAll('.lang-btn').forEach(b => {
                     b.addEventListener('click', () => { switchLang(b.dataset.lang); });
                 });
-                document.getElementById('themeToggle').addEventListener('click', () => {
-                    updateTheme(currentTheme === 'light' ? 'dark' : 'light');
+                const themeBtn = document.getElementById('themeToggle');
+                themeBtn.addEventListener('click', () => {
+                    toggleThemeWithCircle(themeBtn);
                 });
                 modalClose.addEventListener('click', closeModal);
                 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
