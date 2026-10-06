@@ -1913,6 +1913,303 @@
             clip-path: circle(var(--r, 150vmax) at var(--x, 50%) var(--y, 50%));
         }
 
+        /* ============================================================
+           原子轨道云 —— 入口按钮 & 全屏查看器
+           与现有新拟态 / 玻璃拟态语言保持一致
+           ============================================================ */
+        .orbital-btn {
+            background: transparent;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: grid;
+            place-items: center;
+            position: relative;
+            z-index: 1;
+            line-height: 1;
+            transition: color 0.3s, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .orbital-btn:hover {
+            color: var(--primary);
+            transform: scale(1.1) rotate(24deg);
+        }
+        .orbital-btn:active {
+            transform: scale(0.92) rotate(24deg);
+        }
+        .orbital-btn svg {
+            width: 19px;
+            height: 19px;
+            display: block;
+        }
+        [data-theme="dark"] .orbital-btn {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        [data-theme="dark"] .orbital-btn:hover {
+            color: #4A7AFF;
+        }
+
+        .orbital-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            /* visibility 延迟到 opacity 渐变结束后再切换，保证过渡自然；
+               同时确保子元素（即便设置了 pointer-events: auto）
+               也无法在关闭状态下接收鼠标事件，
+               从而不破坏下方收藏夹等元素的 pointerenter / pointerleave 交互 */
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.5s;
+            overflow: hidden;
+            isolation: isolate;
+            background: #03040a;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        .orbital-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0s;
+        }
+        #orbitalCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+        }
+        .orbital-hud {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 26px 28px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .orbital-hud__top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .orbital-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #e8eefc;
+            font-family: var(--font-sans);
+        }
+        .orbital-header__dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #4dd0ff;
+            box-shadow: 0 0 14px #4dd0ff, 0 0 32px rgba(77, 208, 255, 0.5);
+            flex-shrink: 0;
+        }
+        .orbital-header__title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            line-height: 1.2;
+        }
+        .orbital-header__sub {
+            font-size: 9.5px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(175, 196, 232, 0.38);
+            margin-top: 5px;
+            font-family: var(--font-sans);
+        }
+        .orbital-close {
+            pointer-events: auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            color: rgba(220, 232, 250, 0.75);
+            font-size: 15px;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1;
+        }
+        .orbital-close:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            transform: scale(1.08);
+        }
+        .orbital-close:active {
+            transform: scale(0.94);
+        }
+        .orbital-hud__bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .orbital-panel {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding: 12px 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            box-shadow: 0 12px 46px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            max-width: min(94vw, 960px);
+            max-height: 42vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+            font-family: var(--font-sans);
+        }
+        .orbital-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .orbital-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 3px;
+        }
+        .orbital-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+        }
+        .orbital-tag {
+            font-size: 9.5px;
+            letter-spacing: 0.06em;
+            color: rgba(160, 185, 225, 0.42);
+            width: 28px;
+            flex-shrink: 0;
+            text-align: right;
+            padding-top: 7px;
+            font-variant-numeric: tabular-nums;
+            font-family: var(--font-mono);
+        }
+        .orbital-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            flex: 1;
+        }
+        .orbital-chip {
+            border: 0;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(208, 224, 250, 0.62);
+            font-family: var(--font-sans);
+            font-size: 11.5px;
+            letter-spacing: 0.02em;
+            padding: 6px 11px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: color 0.22s, background 0.22s, box-shadow 0.22s, transform 0.12s;
+            white-space: nowrap;
+            line-height: 1.25;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .orbital-chip sub {
+            font-size: 0.72em;
+        }
+        .orbital-chip:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.11);
+        }
+        .orbital-chip:active {
+            transform: scale(0.95);
+        }
+        .orbital-chip.active {
+            color: #03121a;
+            font-weight: 700;
+            background: linear-gradient(135deg, #5edcff, #b3f5ff);
+            box-shadow: 0 0 20px rgba(93, 220, 255, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+        }
+        .orbital-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-family: var(--font-sans);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            color: rgba(168, 194, 235, 0.48);
+        }
+        .orbital-meta b {
+            color: rgba(220, 235, 255, 0.85);
+            font-weight: 600;
+            margin-left: 4px;
+            letter-spacing: 0.06em;
+        }
+        .orb-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .orb-dot.pos {
+            background: #4dd0ff;
+            box-shadow: 0 0 10px #4dd0ff;
+        }
+        .orb-dot.neg {
+            background: #ff4fa3;
+            box-shadow: 0 0 10px #ff4fa3;
+        }
+        .orbital-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            color: rgba(190, 212, 245, 0.7);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .orbital-loading.visible {
+            opacity: 1;
+        }
+        .orbital-loading__ring {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #4dd0ff;
+            animation: orbitalSpin 0.9s linear infinite;
+        }
+        @keyframes orbitalSpin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 700px) {
             :root { --card-size: 38px; }
             .modal-dialog { width: 92vw; max-height: 90vh; }
@@ -1943,6 +2240,15 @@
                 transform: scale(0.9);
                 transform-origin: center bottom;
             }
+            /* 轨道云移动端适配 */
+            .orbital-hud { padding: 18px 14px; }
+            .orbital-header__title { font-size: 15px; }
+            .orbital-header__sub { font-size: 8.5px; letter-spacing: 0.16em; }
+            .orbital-panel { padding: 9px 10px; max-height: 40vh; border-radius: 14px; }
+            .orbital-tag { width: 22px; font-size: 8.5px; padding-top: 5px; }
+            .orbital-chip { padding: 5px 8px; font-size: 10.5px; border-radius: 7px; }
+            .orbital-meta { font-size: 9.5px; gap: 9px; }
+            .orbital-close { width: 34px; height: 34px; font-size: 13px; }
         }
         @media (max-width: 450px) {
             :root { --card-size: 30px; }
@@ -1963,7 +2269,216 @@
             ::view-transition-new(root) { animation: none !important; }
             .theme-mask { transition: none !important; }
         }
+
+        /* ============================================================
+           原子轨道云 —— 主题变量 / 调色板 / 日夜间切换
+           （由「电子轨道云」完整版集成而来）
+           ============================================================ */
+
+        /* 深色（默认）主题变量 */
+        .orbital-overlay {
+            --orb-hud-text: #e8eefc;
+            --orb-hud-sub: rgba(175,196,232,0.40);
+            --orb-panel-bg: rgba(255,255,255,0.045);
+            --orb-panel-border: rgba(255,255,255,0.09);
+            --orb-chip-bg: rgba(255,255,255,0.05);
+            --orb-chip-text: rgba(208,224,250,0.62);
+            --orb-chip-hover: rgba(255,255,255,0.11);
+            --orb-chip-active-text: #03121a;
+            --orb-ring: rgba(255,255,255,0.92);
+            --orb-pos: #4dd0ff;
+            --orb-neg: #ff4fa3;
+            --orb-pos-soft: #b3f5ff;
+            --orb-pos-glow: rgba(77,208,255,0.45);
+            --orb-shadow: 0 12px 46px rgba(0,0,0,0.5);
+            --orb-bg: #03040a;
+            background: var(--orb-bg);
+        }
+
+        /* 浅色（日间）主题变量 */
+        .orbital-overlay[data-orbital-theme="light"] {
+            --orb-hud-text: #1e2938;
+            --orb-hud-sub: rgba(90,98,114,0.58);
+            --orb-panel-bg: rgba(255,255,255,0.78);
+            --orb-panel-border: rgba(15,23,42,0.08);
+            --orb-chip-bg: rgba(255,255,255,0.88);
+            --orb-chip-text: rgba(30,41,56,0.58);
+            --orb-chip-hover: rgba(15,23,42,0.06);
+            --orb-chip-active-text: #ffffff;
+            --orb-ring: rgba(30,41,56,0.82);
+            --orb-pos-glow: transparent;
+            --orb-shadow: 0 12px 40px rgba(30,41,56,0.13);
+            --orb-bg: #eef1f7;
+        }
+
+        /* 顶栏右侧控件容器 */
+        .orbital-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        /* 调色板 */
+        .orbital-palettes {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: var(--orb-panel-bg);
+            border: 1px solid var(--orb-panel-border);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            box-shadow: var(--orb-shadow);
+            transition: background .45s ease, border-color .45s ease, box-shadow .45s ease;
+            max-width: min(60vw, 420px);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .orbital-palettes::-webkit-scrollbar { display: none; }
+
+        .orbital-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: transform .28s cubic-bezier(.34,1.56,.64,1), box-shadow .28s ease;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .orbital-swatch:hover { transform: scale(1.16); }
+        .orbital-swatch:active { transform: scale(.94); }
+        .orbital-swatch.active {
+            box-shadow: 0 0 0 2px var(--orb-ring), inset 0 0 0 1px rgba(255,255,255,0.25);
+            transform: scale(1.06);
+        }
+
+        /* 日 / 夜主题按钮（保留但点击时联动主主题，保证与主页面同步） */
+        .orbital-theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            padding: 0;
+            flex-shrink: 0;
+            border: 1px solid var(--orb-panel-border);
+            background: var(--orb-panel-bg);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            box-shadow: var(--orb-shadow);
+            color: var(--orb-hud-text);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: color .3s, background .45s, border-color .45s, box-shadow .45s, transform .3s;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+        .orbital-theme-btn:hover { transform: scale(1.08); }
+        .orbital-theme-btn:active { transform: scale(.93); }
+        .orbital-theme-btn svg {
+            width: 18px;
+            height: 18px;
+            grid-area: 1 / 1;
+            transform-origin: 50% 50%;
+            will-change: transform, opacity;
+        }
+
+        /* 深色模式：月亮在位 */
+        .orbital-overlay[data-orbital-theme="dark"] .orbital-theme-btn .icon-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+            transition: opacity .2s ease .18s, transform .55s cubic-bezier(.34,1.56,.64,1) .18s;
+        }
+        .orbital-overlay[data-orbital-theme="dark"] .orbital-theme-btn .icon-sun {
+            opacity: 0;
+            transform: rotate(-90deg) scale(.3);
+            transition: opacity .2s ease, transform .28s ease;
+        }
+        /* 浅色模式：太阳在位 */
+        .orbital-overlay[data-orbital-theme="light"] .orbital-theme-btn .icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+            transition: opacity .2s ease .18s, transform .55s cubic-bezier(.34,1.56,.64,1) .18s;
+        }
+        .orbital-overlay[data-orbital-theme="light"] .orbital-theme-btn .icon-moon {
+            opacity: 0;
+            transform: rotate(90deg) scale(.3);
+            transition: opacity .2s ease, transform .28s ease;
+        }
+
+        /* 用变量覆盖原有硬编码颜色，使 HUD 随轨道云主题联动 */
+        .orbital-header { color: var(--orb-hud-text); }
+        .orbital-header__dot {
+            background: var(--orb-pos);
+            box-shadow: 0 0 14px var(--orb-pos), 0 0 32px var(--orb-pos-glow);
+        }
+        .orbital-header__sub { color: var(--orb-hud-sub); }
+        .orbital-close {
+            border: 1px solid var(--orb-panel-border);
+            background: var(--orb-panel-bg);
+            color: var(--orb-hud-text);
+            box-shadow: var(--orb-shadow), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .orbital-close:hover {
+            background: var(--orb-chip-hover);
+            color: var(--orb-hud-text);
+        }
+        .orbital-panel {
+            background: var(--orb-panel-bg);
+            border: 1px solid var(--orb-panel-border);
+            box-shadow: var(--orb-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .orbital-tag { color: var(--orb-hud-sub); }
+        .orbital-chip {
+            background: var(--orb-chip-bg);
+            color: var(--orb-chip-text);
+        }
+        .orbital-chip:hover {
+            color: var(--orb-hud-text);
+            background: var(--orb-chip-hover);
+        }
+        .orbital-chip.active {
+            color: var(--orb-chip-active-text);
+            background: linear-gradient(135deg, var(--orb-pos), var(--orb-pos-soft));
+            box-shadow: 0 0 20px var(--orb-pos-glow), inset 0 0 0 1px rgba(255,255,255,0.5);
+        }
+        .orbital-meta { color: var(--orb-hud-sub); }
+        .orbital-meta b { color: var(--orb-hud-text); }
+        .orb-dot.pos { background: var(--orb-pos); box-shadow: 0 0 10px var(--orb-pos); }
+        .orb-dot.neg { background: var(--orb-neg); box-shadow: 0 0 10px var(--orb-neg); }
+
+        /* 轨道云控件的小屏适配 */
+        @media (max-width: 700px) {
+            .orbital-controls { gap: 6px; }
+            .orbital-palettes { padding: 5px 7px; gap: 5px; max-width: 42vw; }
+            .orbital-swatch { width: 15px; height: 15px; }
+            .orbital-theme-btn { width: 32px; height: 32px; }
+            .orbital-theme-btn svg { width: 16px; height: 16px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .orbital-theme-btn svg { transition: none !important; }
+        }
     </style>
+
+    <!-- Three.js 模块映射：轨道云按需动态加载，不影响首屏 -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
 </head>
 <body>
 
@@ -1991,6 +2506,48 @@
             <div class="pay-qr-box">
                 <!-- 收款码占位：把下面的 <div> 替换为 <img src="你的收款码图片地址" alt="收款码"> 即可 -->
                 <div class="pay-qr-placeholder"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 原子轨道云（全屏查看器） -->
+    <div class="orbital-overlay" id="orbitalOverlay" aria-hidden="true" data-orbital-theme="dark">
+        <canvas id="orbitalCanvas"></canvas>
+        <div class="orbital-loading" id="orbitalLoading">
+            <div class="orbital-loading__ring"></div>
+            <div>初始化轨道云…</div>
+        </div>
+        <div class="orbital-hud">
+            <div class="orbital-hud__top">
+                <div class="orbital-header">
+                    <span class="orbital-header__dot"></span>
+                    <div>
+                        <div class="orbital-header__title" id="orbitalTitle">原子轨道云</div>
+                        <div class="orbital-header__sub" id="orbitalSub">Atomic Orbital Cloud · Probability Density</div>
+                    </div>
+                </div>
+                <div class="orbital-controls">
+                    <div class="orbital-palettes" id="orbitalPalettes"></div>
+                    <button class="orbital-theme-btn" id="orbitalThemeBtn" title="切换深浅配色（与周期表同步）" aria-label="切换深浅配色">
+                        <!-- 月亮 -->
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+                        </svg>
+                        <!-- 太阳 -->
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4.5"/>
+                            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2
+                                     M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19"/>
+                        </svg>
+                    </button>
+                    <button class="orbital-close" id="orbitalClose" aria-label="关闭">✕</button>
+                </div>
+            </div>
+            <div class="orbital-hud__bottom">
+                <nav class="orbital-panel" id="orbitalPanel"></nav>
+                <div class="orbital-meta" id="orbitalMeta"></div>
             </div>
         </div>
     </div>
@@ -2026,6 +2583,16 @@
                         </svg>
                     </button>
                 </div>
+                <!-- 原子轨道云入口 -->
+                <button class="orbital-btn" id="orbitalToggle" title="原子轨道云" aria-label="原子轨道云">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/>
+                        <ellipse cx="12" cy="12" rx="9.6" ry="4.1"/>
+                        <ellipse cx="12" cy="12" rx="9.6" ry="4.1" transform="rotate(60 12 12)"/>
+                        <ellipse cx="12" cy="12" rx="9.6" ry="4.1" transform="rotate(120 12 12)"/>
+                    </svg>
+                </button>
                 <div class="sling-button" id="slingButton">
                     <svg class="sling-button__fx" viewBox="-140 -140 280 280" aria-hidden="true">
                         <g class="sling-button__tension" style="opacity: 0">
@@ -2128,7 +2695,13 @@
                     'fav_hold_clear': '长按清空',
                     'fav_cleared': '已清空收藏夹',
                     'pay_title': '❤️ 请作者喝杯咖啡 ☕',
-                    'pay_subtitle': '扫码支持一下'
+                    'pay_subtitle': '扫码支持一下',
+                    'orbital_title': '原子轨道云',
+                    'orbital_sub': 'Atomic Orbital Cloud · Probability Density',
+                    'orbital_orb': '轨道',
+                    'orbital_positive': '正相位',
+                    'orbital_negative': '负相位',
+                    'orbital_loading': '初始化轨道云…'
                 },
                 'zh-tw': {
                     'header_title': '元素週期表',
@@ -2167,7 +2740,13 @@
                     'fav_hold_clear': '長按清空',
                     'fav_cleared': '已清空收藏夾',
                     'pay_title': '❤️ 請作者喝杯咖啡 ☕',
-                    'pay_subtitle': '掃碼支持一下'
+                    'pay_subtitle': '掃碼支持一下',
+                    'orbital_title': '原子軌道雲',
+                    'orbital_sub': 'Atomic Orbital Cloud · Probability Density',
+                    'orbital_orb': '軌道',
+                    'orbital_positive': '正相位',
+                    'orbital_negative': '負相位',
+                    'orbital_loading': '初始化軌道雲…'
                 },
                 'en': {
                     'header_title': 'Periodic Table',
@@ -2206,7 +2785,13 @@
                     'fav_hold_clear': 'Hold to clear',
                     'fav_cleared': 'Favorites cleared',
                     'pay_title': '❤️ Buy me a coffee ☕',
-                    'pay_subtitle': 'Scan to support'
+                    'pay_subtitle': 'Scan to support',
+                    'orbital_title': 'Atomic Orbital Cloud',
+                    'orbital_sub': 'Probability Density Sampling',
+                    'orbital_orb': 'Orbital',
+                    'orbital_positive': 'Positive phase',
+                    'orbital_negative': 'Negative phase',
+                    'orbital_loading': 'Loading orbital cloud…'
                 },
                 'ja': {
                     'header_title': '周期表',
@@ -2245,7 +2830,13 @@
                     'fav_hold_clear': '長押しでクリア',
                     'fav_cleared': 'お気に入りをクリアしました',
                     'pay_title': '❤️ コーヒーをおごる ☕',
-                    'pay_subtitle': 'スキャンして応援'
+                    'pay_subtitle': 'スキャンして応援',
+                    'orbital_title': '原子軌道クラウド',
+                    'orbital_sub': 'Probability Density Sampling',
+                    'orbital_orb': '軌道',
+                    'orbital_positive': '正の位相',
+                    'orbital_negative': '負の位相',
+                    'orbital_loading': '軌道クラウドを初期化中…'
                 }
             };
 
@@ -2738,7 +3329,18 @@
                 const paySubEl = document.getElementById('payModalSubtitle');
                 if (payTitleEl) payTitleEl.textContent = t('pay_title');
                 if (paySubEl) paySubEl.textContent = t('pay_subtitle');
+                /* 轨道云标题/副标题随语言切换 */
+                const oTitle = document.getElementById('orbitalTitle');
+                const oSub = document.getElementById('orbitalSub');
+                const oLoading = document.querySelector('#orbitalLoading div:last-child');
+                const oBtn = document.getElementById('orbitalToggle');
+                if (oTitle) oTitle.textContent = t('orbital_title');
+                if (oSub) oSub.textContent = t('orbital_sub');
+                if (oLoading) oLoading.textContent = t('orbital_loading');
+                if (oBtn) oBtn.title = t('orbital_title');
                 if (favFolderInstance && favFolderInstance.updateLabels) favFolderInstance.updateLabels();
+                /* 轨道云元信息随语言刷新 */
+                if (orbitalAPI && orbitalAPI.refreshMeta) orbitalAPI.refreshMeta();
             }
 
             function updateSlider() {
@@ -3201,6 +3803,10 @@
                     themeBtn.setAttribute('aria-label', label);
                 }
                 if (phaseColorMode) applyCardStyles();
+                /* 同步到已初始化的轨道云 —— 使轨道云日/夜模式与主页面保持一致 */
+                if (orbitalAPI && orbitalAPI.setTheme) {
+                    orbitalAPI.setTheme(th === 'dark' ? 'dark' : 'light');
+                }
             }
 
             /* ============================================================
@@ -4079,6 +4685,860 @@
                 });
             }
 
+            /* ============================================================
+               原子轨道云 —— 模块（按需动态加载 Three.js）
+               ============================================================ */
+            let orbitalAPI = null;          // { start, stop, refreshMeta, setTheme }
+            let orbitalPromise = null;      // 加载中的 Promise
+            const orbitalOverlayEl = document.getElementById('orbitalOverlay');
+            const orbitalLoadingEl = document.getElementById('orbitalLoading');
+
+            async function createOrbitalCloud() {
+                const THREE = await import('three');
+                const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+                const { EffectComposer } = await import('three/addons/postprocessing/EffectComposer.js');
+                const { RenderPass } = await import('three/addons/postprocessing/RenderPass.js');
+                const { UnrealBloomPass } = await import('three/addons/postprocessing/UnrealBloomPass.js');
+                const { OutputPass } = await import('three/addons/postprocessing/OutputPass.js');
+
+                /* ======================================================
+                   一、配置
+                   ====================================================== */
+                const POINT_COUNT   = 28000;   // 每个轨道采样点数
+                const TARGET_RADIUS = 6.5;     // 归一化显示半径（按 97% 分位）
+                const PREF_KEY      = 'orbital-cloud-prefs-v2';
+
+                /* ---------- 模式（日 / 夜）配置 ----------
+                   深色：叠加混合 + 柔光贴图 + 泛光，通透发光
+                   浅色：普通混合 + 实心贴图 + 关闭泛光，白底清晰
+                -------------------------------------------- */
+                const MODES = {
+                    dark: {
+                        bg: ['#101a33', '#020308'],
+                        blending: THREE.AdditiveBlending,
+                        opacity: 0.42,
+                        pointSize: 0.090,
+                        bloom: { strength: 1.15, radius: 0.70, threshold: 0.02 }
+                    },
+                    light: {
+                        // 中心近白，边缘浅灰蓝，给深色点云留出对比空间
+                        bg: ['#ffffff', '#c9d4e4'],
+                        blending: THREE.NormalBlending,
+                        opacity: 0.94,
+                        pointSize: 0.105,
+                        // 完全关闭泛光，避免白底上叠白光把点洗掉
+                        bloom: { strength: 0, radius: 0.4, threshold: 1.0 }
+                    }
+                };
+
+                /* ---------- 配色方案 ----------
+                   每套方案含「深色版」与「浅色版」两组相位色。
+                   浅色版均选用在白底上对比度足够的饱和深色。
+                --------------------------------- */
+                const PALETTES = [
+                    { name:'极光 Aurora',
+                      dark:  { pos:'#4dd0ff', neg:'#ff4fa3' },
+                      light: { pos:'#0369a1', neg:'#be185d' } },
+
+                    { name:'日落 Sunset',
+                      dark:  { pos:'#ffa94d', neg:'#c084fc' },
+                      light: { pos:'#c2410c', neg:'#7e22ce' } },
+
+                    { name:'赛博 Cyber',
+                      dark:  { pos:'#39ff14', neg:'#ff00aa' },
+                      light: { pos:'#047857', neg:'#be185d' } },
+
+                    { name:'海洋 Ocean',
+                      dark:  { pos:'#22d3ee', neg:'#4f8ef7' },
+                      light: { pos:'#0e7490', neg:'#3730a3' } },
+
+                    { name:'熔岩 Lava',
+                      dark:  { pos:'#fbbf24', neg:'#ef4444' },
+                      light: { pos:'#b45309', neg:'#b91c1c' } },
+
+                    { name:'紫罗兰 Violet',
+                      dark:  { pos:'#a78bfa', neg:'#f472b6' },
+                      light: { pos:'#6d28d9', neg:'#be185d' } },
+
+                    { name:'薄荷 Mint',
+                      dark:  { pos:'#34d399', neg:'#60a5fa' },
+                      light: { pos:'#047857', neg:'#1d4ed8' } },
+
+                    { name:'极简 Mono',
+                      dark:  { pos:'#e2e8f0', neg:'#7c8798' },
+                      light: { pos:'#1e293b', neg:'#94a3b8' } },
+
+                    { name:'玫瑰 Rose',
+                      dark:  { pos:'#fda4af', neg:'#c4b5fd' },
+                      light: { pos:'#9f1239', neg:'#6d28d9' } },
+
+                    { name:'森林 Forest',
+                      dark:  { pos:'#86efac', neg:'#bef264' },
+                      light: { pos:'#15803d', neg:'#4d7c0f' } }
+                ];
+
+                /* ---------- 全部轨道：n = 1~4 共 30 个 ----------
+                   R(r) : 类氢径向波函数（未归一化，r 以玻尔半径为单位）
+                   Y()  : 实球谐角向部分（构建时按数值最大值归一化）
+                   rmax : 径向采样截断半径
+                ------------------------------------------------- */
+                const ORBITALS = [
+                    /* n = 1 */
+                    { id:'1s', n:1, l:0, label:'1s',
+                      R: r => Math.exp(-r), rmax: 12,
+                      Y: () => 1 },
+
+                    /* n = 2 */
+                    { id:'2s', n:2, l:0, label:'2s',
+                      R: r => (2 - r) * Math.exp(-r / 2), rmax: 24,
+                      Y: () => 1 },
+                    { id:'2pz', n:2, l:1, label:'2p<sub>z</sub>',
+                      R: r => r * Math.exp(-r / 2), rmax: 24,
+                      Y: (ct) => ct },
+                    { id:'2px', n:2, l:1, label:'2p<sub>x</sub>',
+                      R: r => r * Math.exp(-r / 2), rmax: 24,
+                      Y: (ct, st, phi) => st * Math.cos(phi) },
+                    { id:'2py', n:2, l:1, label:'2p<sub>y</sub>',
+                      R: r => r * Math.exp(-r / 2), rmax: 24,
+                      Y: (ct, st, phi) => st * Math.sin(phi) },
+
+                    /* n = 3 */
+                    { id:'3s', n:3, l:0, label:'3s',
+                      R: r => (27 - 18 * r + 2 * r * r) * Math.exp(-r / 3), rmax: 45,
+                      Y: () => 1 },
+                    { id:'3pz', n:3, l:1, label:'3p<sub>z</sub>',
+                      R: r => r * (6 - r) * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct) => ct },
+                    { id:'3px', n:3, l:1, label:'3p<sub>x</sub>',
+                      R: r => r * (6 - r) * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct, st, phi) => st * Math.cos(phi) },
+                    { id:'3py', n:3, l:1, label:'3p<sub>y</sub>',
+                      R: r => r * (6 - r) * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct, st, phi) => st * Math.sin(phi) },
+                    { id:'3dz2', n:3, l:2, label:'3d<sub>z²</sub>',
+                      R: r => r * r * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct) => (3 * ct * ct - 1) / 2 },
+                    { id:'3dxz', n:3, l:2, label:'3d<sub>xz</sub>',
+                      R: r => r * r * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct, st, phi) => st * ct * Math.cos(phi) },
+                    { id:'3dyz', n:3, l:2, label:'3d<sub>yz</sub>',
+                      R: r => r * r * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct, st, phi) => st * ct * Math.sin(phi) },
+                    { id:'3dxy', n:3, l:2, label:'3d<sub>xy</sub>',
+                      R: r => r * r * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct, st, phi) => st * st * Math.sin(2 * phi) },
+                    { id:'3dx2y2', n:3, l:2, label:'3d<sub>x²−y²</sub>',
+                      R: r => r * r * Math.exp(-r / 3), rmax: 45,
+                      Y: (ct, st, phi) => st * st * Math.cos(2 * phi) },
+
+                    /* n = 4 */
+                    { id:'4s', n:4, l:0, label:'4s',
+                      R: r => (192 - 144 * r + 24 * r * r - r * r * r) * Math.exp(-r / 4), rmax: 80,
+                      Y: () => 1 },
+                    { id:'4pz', n:4, l:1, label:'4p<sub>z</sub>',
+                      R: r => r * (80 - 20 * r + r * r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct) => ct },
+                    { id:'4px', n:4, l:1, label:'4p<sub>x</sub>',
+                      R: r => r * (80 - 20 * r + r * r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * Math.cos(phi) },
+                    { id:'4py', n:4, l:1, label:'4p<sub>y</sub>',
+                      R: r => r * (80 - 20 * r + r * r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * Math.sin(phi) },
+                    { id:'4dz2', n:4, l:2, label:'4d<sub>z²</sub>',
+                      R: r => r * r * (12 - r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct) => (3 * ct * ct - 1) / 2 },
+                    { id:'4dxz', n:4, l:2, label:'4d<sub>xz</sub>',
+                      R: r => r * r * (12 - r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * ct * Math.cos(phi) },
+                    { id:'4dyz', n:4, l:2, label:'4d<sub>yz</sub>',
+                      R: r => r * r * (12 - r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * ct * Math.sin(phi) },
+                    { id:'4dxy', n:4, l:2, label:'4d<sub>xy</sub>',
+                      R: r => r * r * (12 - r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * st * Math.sin(2 * phi) },
+                    { id:'4dx2y2', n:4, l:2, label:'4d<sub>x²−y²</sub>',
+                      R: r => r * r * (12 - r) * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * st * Math.cos(2 * phi) },
+                    { id:'4fz3', n:4, l:3, label:'4f<sub>z³</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct) => ct * (5 * ct * ct - 3) },
+                    { id:'4fxz2', n:4, l:3, label:'4f<sub>xz²</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * (5 * ct * ct - 1) * Math.cos(phi) },
+                    { id:'4fyz2', n:4, l:3, label:'4f<sub>yz²</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * (5 * ct * ct - 1) * Math.sin(phi) },
+                    { id:'4fxyz', n:4, l:3, label:'4f<sub>xyz</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * st * ct * Math.sin(2 * phi) },
+                    { id:'4fzx2y2', n:4, l:3, label:'4f<sub>z(x²−y²)</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => ct * st * st * Math.cos(2 * phi) },
+                    { id:'4fxx23y2', n:4, l:3, label:'4f<sub>x(x²−3y²)</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * st * st * Math.cos(3 * phi) },
+                    { id:'4fy3x2y2', n:4, l:3, label:'4f<sub>y(3x²−y²)</sub>',
+                      R: r => r * r * r * Math.exp(-r / 4), rmax: 80,
+                      Y: (ct, st, phi) => st * st * st * Math.sin(3 * phi) }
+                ];
+
+                /* ======================================================
+                   二、采样与几何构建
+                   ====================================================== */
+
+                /* ---------- 径向概率密度逆变换采样 ----------
+                   P(r) ∝ r²·R(r)² ，建立 CDF 后逆变换采样半径
+                --------------------------------------------- */
+                function makeRadialSampler(R, rmax, N = 1600) {
+                    const dr  = rmax / N;
+                    const cdf = new Float64Array(N + 1);
+                    let acc = 0;
+
+                    for (let i = 1; i <= N; i++) {
+                        const r = i * dr;
+                        const v = R(r);
+                        acc += r * r * v * v * dr;
+                        cdf[i] = acc;
+                    }
+                    if (acc <= 0) acc = 1;
+                    for (let i = 0; i <= N; i++) cdf[i] /= acc;
+
+                    return function sample() {
+                        const u = Math.random();
+                        let lo = 0, hi = N;
+                        while (hi - lo > 1) {
+                            const mid = (lo + hi) >> 1;
+                            if (cdf[mid] < u) lo = mid; else hi = mid;
+                        }
+                        const span = cdf[hi] - cdf[lo];
+                        const f = span > 1e-12 ? (u - cdf[lo]) / span : 0;
+                        return (lo + f) * dr;
+                    };
+                }
+
+                /* ---------- 角向 |Y| 最大值（用于拒绝采样归一化） ---------- */
+                const yMaxCache = new Map();
+                function getYMax(orb) {
+                    if (yMaxCache.has(orb.id)) return yMaxCache.get(orb.id);
+                    let m = 0;
+                    for (let i = 0; i < 40000; i++) {
+                        const ct  = Math.random() * 2 - 1;
+                        const st  = Math.sqrt(Math.max(0, 1 - ct * ct));
+                        const phi = Math.random() * Math.PI * 2;
+                        const v   = Math.abs(orb.Y(ct, st, phi));
+                        if (v > m) m = v;
+                    }
+                    if (m < 1e-6) m = 1;
+                    yMaxCache.set(orb.id, m);
+                    return m;
+                }
+
+                /* ---------- 构建轨道几何 ----------
+                   1. 按 r²R² 逆变换采样半径
+                   2. 球面均匀方向 + |Y|² 拒绝采样
+                   3. 记录「带符号亮度」：正 = 正相位，负 = 负相位
+                   4. 按 97% 分位半径归一化尺寸
+                   5. 颜色缓冲先留空，由 applyPalette() 按当前主题填充
+                ----------------------------------- */
+                function buildOrbitalGeometry(orb) {
+                    const sampleR = makeRadialSampler(orb.R, orb.rmax);
+                    const ymax    = getYMax(orb);
+
+                    const positions = new Float32Array(POINT_COUNT * 3);
+                    const signs     = new Float32Array(POINT_COUNT);   // 带符号亮度
+
+                    let count = 0;
+                    let guard = 0;
+                    const MAX_GUARD = POINT_COUNT * 220;
+
+                    while (count < POINT_COUNT && guard < MAX_GUARD) {
+                        guard++;
+
+                        const r = sampleR();
+
+                        // 球面均匀方向
+                        const ct  = Math.random() * 2 - 1;
+                        const phi = Math.random() * Math.PI * 2;
+                        const st  = Math.sqrt(Math.max(0, 1 - ct * ct));
+
+                        // 角向拒绝采样：接受概率 ∝ |Y|²
+                        const y = orb.Y(ct, st, phi) / ymax;
+                        if (y * y < Math.random()) continue;
+
+                        // 相位符号 × 亮度扰动，让点云有自然的层次
+                        const phase = (orb.R(r) * y) >= 0 ? 1 : -1;
+                        signs[count] = phase * (0.70 + Math.random() * 0.58);
+
+                        const i3 = count * 3;
+                        positions[i3]     = r * st * Math.cos(phi);
+                        positions[i3 + 1] = r * ct;
+                        positions[i3 + 2] = r * st * Math.sin(phi);
+
+                        count++;
+                    }
+
+                    // 按 97% 分位半径归一化到统一显示尺寸
+                    const radii = new Float32Array(count);
+                    for (let i = 0; i < count; i++) {
+                        const i3 = i * 3;
+                        radii[i] = Math.hypot(positions[i3], positions[i3 + 1], positions[i3 + 2]);
+                    }
+                    radii.sort();
+                    const ref   = radii[Math.min(count - 1, Math.floor(count * 0.97))] || 1;
+                    const scale = TARGET_RADIUS / ref;
+                    for (let i = 0; i < count * 3; i++) positions[i] *= scale;
+
+                    const geo = new THREE.BufferGeometry();
+                    geo.setAttribute('position',
+                        new THREE.BufferAttribute(positions.subarray(0, count * 3), 3));
+                    // 颜色缓冲先占位，稍后由 applyPalette 填充
+                    geo.setAttribute('color',
+                        new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+                    geo.userData.signs = signs.subarray(0, count);
+                    geo.userData.count = count;
+                    geo.computeBoundingSphere();
+
+                    return geo;
+                }
+
+                /* ======================================================
+                   三、贴图工具
+                   ====================================================== */
+
+                /* 点贴图：深色用柔光，浅色用实心
+                   浅色模式的点如果也用柔光贴图，在白底上会「虚」到看不见，
+                   所以改用中心实、边缘快速衰减的圆点，保证单点对比度。
+                ----------------------------------------------------- */
+                function makeDotTexture(mode) {
+                    const S = 64;
+                    const cvs = document.createElement('canvas');
+                    cvs.width = cvs.height = S;
+                    const ctx = cvs.getContext('2d');
+                    const g = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+
+                    if (mode === 'dark') {
+                        // 柔光：中心亮，边缘渐隐，适合叠加混合
+                        g.addColorStop(0.00, 'rgba(255,255,255,1)');
+                        g.addColorStop(0.22, 'rgba(255,255,255,0.85)');
+                        g.addColorStop(0.55, 'rgba(255,255,255,0.28)');
+                        g.addColorStop(1.00, 'rgba(255,255,255,0)');
+                    } else {
+                        // 实心：中心实，边缘快速衰减，普通混合下清晰可辨
+                        g.addColorStop(0.00, 'rgba(255,255,255,1)');
+                        g.addColorStop(0.52, 'rgba(255,255,255,0.96)');
+                        g.addColorStop(0.78, 'rgba(255,255,255,0.55)');
+                        g.addColorStop(1.00, 'rgba(255,255,255,0)');
+                    }
+
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, S, S);
+
+                    const tex = new THREE.CanvasTexture(cvs);
+                    tex.colorSpace = THREE.SRGBColorSpace;
+                    return tex;
+                }
+
+                /* 径向渐变背景贴图（随主题变化） */
+                function makeBgTexture(innerHex, outerHex) {
+                    const S = 512;
+                    const cvs = document.createElement('canvas');
+                    cvs.width = cvs.height = S;
+                    const ctx = cvs.getContext('2d');
+                    const g = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S * 0.72);
+                    g.addColorStop(0.00, innerHex);
+                    g.addColorStop(0.55, outerHex);
+                    g.addColorStop(1.00, outerHex);
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, S, S);
+
+                    const tex = new THREE.CanvasTexture(cvs);
+                    tex.colorSpace = THREE.SRGBColorSpace;
+                    return tex;
+                }
+
+                /* ======================================================
+                   四、本地偏好持久化（调色板 & 轨道选择；主题跟随主页面）
+                   ====================================================== */
+                function loadPrefs() {
+                    try {
+                        const raw = localStorage.getItem(PREF_KEY);
+                        if (!raw) return null;
+                        const obj = JSON.parse(raw);
+                        return (obj && typeof obj === 'object') ? obj : null;
+                    } catch (e) { return null; }
+                }
+
+                function savePrefs() {
+                    try {
+                        localStorage.setItem(PREF_KEY, JSON.stringify({
+                            theme:   themeKey,
+                            palette: paletteIndex,
+                            orbital: activeOrbId
+                        }));
+                    } catch (e) {}
+                }
+
+                /* ======================================================
+                   五、渲染器与场景
+                   ====================================================== */
+                const canvas = document.getElementById('orbitalCanvas');
+                const renderer = new THREE.WebGLRenderer({
+                    canvas,
+                    antialias: true,
+                    powerPreference: 'high-performance'
+                });
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.toneMapping = THREE.NoToneMapping;   // 保持与 CSS 色值一致
+                renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+                const scene = new THREE.Scene();
+
+                const aspect = window.innerWidth / window.innerHeight;
+                const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 3000);
+                const dist = aspect >= 1 ? 17 : 17 / aspect;
+                camera.position.set(0, dist * 0.26, dist * 0.97).setLength(dist);
+                camera.lookAt(0, 0, 0);
+
+                const controls = new OrbitControls(camera, renderer.domElement);
+                controls.enableDamping   = true;
+                controls.dampingFactor   = 0.06;
+                controls.rotateSpeed     = 0.7;
+                controls.zoomSpeed       = 0.8;
+                controls.enablePan       = false;
+                controls.minDistance     = 7;
+                controls.maxDistance     = 60;
+                controls.autoRotate      = true;
+                controls.autoRotateSpeed = 0.55;
+
+                /* ---------- 后处理 ---------- */
+                const composer = new EffectComposer(renderer);
+                composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                composer.setSize(window.innerWidth, window.innerHeight);
+                composer.addPass(new RenderPass(scene, camera));
+
+                const bloomPass = new UnrealBloomPass(
+                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    1.15, 0.70, 0.02
+                );
+                composer.addPass(bloomPass);
+                composer.addPass(new OutputPass());
+
+                /* ======================================================
+                   六、全局状态
+                   ====================================================== */
+                let spriteTex = null;
+                let points = null;
+                let currentGeo = null;
+                let currentOrb = null;
+
+                let themeKey      = 'dark';
+                let paletteIndex  = 0;
+                let activeOrbId   = null;
+                let fadeStart     = 0;
+
+                const geometryCache = new Map();
+
+                function getGeometry(orb) {
+                    if (!geometryCache.has(orb.id)) {
+                        geometryCache.set(orb.id, buildOrbitalGeometry(orb));
+                    }
+                    return geometryCache.get(orb.id);
+                }
+
+                /* ---------- 按当前主题 + 配色方案填充顶点颜色 ---------- */
+                function applyPalette(geo) {
+                    const pal = PALETTES[paletteIndex][themeKey];
+                    const pos = new THREE.Color(pal.pos);
+                    const neg = new THREE.Color(pal.neg);
+
+                    const signs  = geo.userData.signs;
+                    const count  = geo.userData.count;
+                    const colors = geo.attributes.color;
+
+                    for (let i = 0; i < count; i++) {
+                        const v = signs[i];
+                        const c = v >= 0 ? pos : neg;
+                        const b = Math.abs(v);
+                        colors.setXYZ(i, c.r * b, c.g * b, c.b * b);
+                    }
+                    colors.needsUpdate = true;
+                }
+
+                /* ======================================================
+                   七、界面构建
+                   ====================================================== */
+                const palettesEl = document.getElementById('orbitalPalettes');
+                const panelEl    = document.getElementById('orbitalPanel');
+                const metaEl     = document.getElementById('orbitalMeta');
+                const themeBtnEl = document.getElementById('orbitalThemeBtn');
+
+                function buildPaletteUI() {
+                    palettesEl.innerHTML = '';
+
+                    PALETTES.forEach((p, i) => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'orbital-swatch';
+                        btn.title = p.name;
+                        // 用深色版颜色做色板预览（饱和度高、辨识度好）
+                        btn.style.background =
+                            `linear-gradient(135deg, ${p.dark.pos} 0%, ${p.dark.pos} 48%, ${p.dark.neg} 52%, ${p.dark.neg} 100%)`;
+                        btn.addEventListener('click', () => setPalette(i));
+                        palettesEl.appendChild(btn);
+                    });
+                }
+
+                function buildOrbitalUI() {
+                    panelEl.innerHTML = '';
+
+                    // 按主量子数 n 分组
+                    const shells = new Map();
+                    ORBITALS.forEach(o => {
+                        if (!shells.has(o.n)) shells.set(o.n, []);
+                        shells.get(o.n).push(o);
+                    });
+
+                    [...shells.keys()].sort((a, b) => a - b).forEach(n => {
+                        const row = document.createElement('div');
+                        row.className = 'orbital-row';
+
+                        const tag = document.createElement('span');
+                        tag.className = 'orbital-tag';
+                        tag.textContent = 'n=' + n;
+                        row.appendChild(tag);
+
+                        const btns = document.createElement('div');
+                        btns.className = 'orbital-btns';
+
+                        shells.get(n).forEach(orb => {
+                            const btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'orbital-chip';
+                            btn.dataset.id = orb.id;
+                            btn.innerHTML = orb.label;
+                            btn.addEventListener('click', () => {
+                                if (orb.id === activeOrbId) return;
+                                setOrbital(orb);
+                            });
+                            btns.appendChild(btn);
+                        });
+
+                        row.appendChild(btns);
+                        panelEl.appendChild(row);
+                    });
+                }
+
+                /* ======================================================
+                   八、状态切换
+                   ====================================================== */
+
+                /* ---------- 主题模式 ----------
+                   浅色模式关键改动：
+                   1. 关闭泛光（strength = 0，pass 直接 disabled）
+                   2. 换成实心点贴图
+                   3. 普通混合 + 高不透明度，让点在白底上「实」起来
+                --------------------------------- */
+                function applyMode(key, rebuildBg = false) {
+                    themeKey = key;
+                    const M = MODES[key];
+
+                    // 应用到覆盖层，不影响主页面主题
+                    if (orbitalOverlayEl) {
+                        orbitalOverlayEl.setAttribute('data-orbital-theme', key);
+                    }
+
+                    if (rebuildBg || !scene.background) {
+                        if (scene.background) scene.background.dispose();
+                        scene.background = makeBgTexture(M.bg[0], M.bg[1]);
+                    }
+
+                    // 泛光
+                    if (bloomPass) {
+                        bloomPass.strength  = M.bloom.strength;
+                        bloomPass.radius    = M.bloom.radius;
+                        bloomPass.threshold = M.bloom.threshold;
+                        bloomPass.enabled   = M.bloom.strength > 0.001;
+                    }
+
+                    // 更换点贴图（深浅两套，视觉语言不同）
+                    if (spriteTex) spriteTex.dispose();
+                    spriteTex = makeDotTexture(key);
+
+                    // 点云材质
+                    if (points) {
+                        points.material.map        = spriteTex;
+                        points.material.blending   = M.blending;
+                        points.material.size       = M.pointSize;
+                        points.material.opacity    = M.opacity;
+                        points.material.needsUpdate = true;
+                    }
+
+                    // 顶点颜色
+                    if (currentGeo) applyPalette(currentGeo);
+
+                    updateAccent();
+                    savePrefs();
+                }
+
+                /* ---------- 配色方案 ---------- */
+                function setPalette(i) {
+                    if (i < 0 || i >= PALETTES.length) return;
+                    paletteIndex = i;
+
+                    palettesEl.querySelectorAll('.orbital-swatch').forEach((el, k) => {
+                        el.classList.toggle('active', k === i);
+                    });
+
+                    if (currentGeo) applyPalette(currentGeo);
+                    updateAccent();
+                    savePrefs();
+                }
+
+                /* ---------- 强调色同步（HUD 与点云保持一致） ---------- */
+                function updateAccent() {
+                    const pal = PALETTES[paletteIndex][themeKey];
+                    if (!orbitalOverlayEl) return;
+
+                    orbitalOverlayEl.style.setProperty('--orb-pos', pal.pos);
+                    orbitalOverlayEl.style.setProperty('--orb-neg', pal.neg);
+
+                    // 让激活 chip 的渐变有层次
+                    orbitalOverlayEl.style.setProperty('--orb-pos-soft', mixHex(pal.pos, '#ffffff', 0.28));
+                    orbitalOverlayEl.style.setProperty('--orb-pos-glow',
+                        themeKey === 'dark' ? hexToRgba(pal.pos, 0.45) : 'transparent');
+                }
+
+                function mixHex(a, b, t) {
+                    const ca = hexToRgb(a), cb = hexToRgb(b);
+                    const r  = Math.round(ca[0] + (cb[0] - ca[0]) * t);
+                    const g  = Math.round(ca[1] + (cb[1] - ca[1]) * t);
+                    const bl = Math.round(ca[2] + (cb[2] - ca[2]) * t);
+                    return `rgb(${r},${g},${bl})`;
+                }
+                function hexToRgb(hex) {
+                    const h = hex.replace('#', '');
+                    return [
+                        parseInt(h.substring(0, 2), 16),
+                        parseInt(h.substring(2, 4), 16),
+                        parseInt(h.substring(4, 6), 16)
+                    ];
+                }
+                function hexToRgba(hex, a) {
+                    const [r, g, b] = hexToRgb(hex);
+                    return `rgba(${r},${g},${b},${a})`;
+                }
+
+                /* ---------- 切换轨道 ---------- */
+                function setOrbital(orb) {
+                    activeOrbId = orb.id;
+                    currentOrb = orb;
+
+                    panelEl.querySelectorAll('.orbital-chip').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.id === orb.id);
+                    });
+
+                    // 移除旧点云（几何体缓存保留，不销毁）
+                    if (points) {
+                        scene.remove(points);
+                        points.material.dispose();
+                        points = null;
+                    }
+
+                    const geo = getGeometry(orb);
+                    currentGeo = geo;
+                    applyPalette(geo);
+
+                    const M = MODES[themeKey];
+                    const mat = new THREE.PointsMaterial({
+                        size: M.pointSize,
+                        map: spriteTex,
+                        vertexColors: true,
+                        transparent: true,
+                        opacity: 0,
+                        blending: M.blending,
+                        depthWrite: false,
+                        depthTest: true,
+                        sizeAttenuation: true
+                    });
+
+                    points = new THREE.Points(geo, mat);
+                    points.scale.setScalar(0.93);
+                    scene.add(points);
+
+                    fadeStart = performance.now();
+
+                    updateMeta(orb);
+                    savePrefs();
+                }
+
+                /* ---------- 元信息栏 ---------- */
+                function updateMeta(orb) {
+                    if (!orb || !metaEl) return;
+                    const shellName = ['s', 'p', 'd', 'f'][orb.l] || '';
+                    const displayId = orb.id.replace(/(\d)([a-z])/, '$1$2');
+                    metaEl.innerHTML =
+                        `<span>${t('orbital_orb')}<b>${displayId}</b></span>` +
+                        `<span>n<b>${orb.n}</b></span>` +
+                        `<span>l<b>${orb.l} (${shellName})</b></span>` +
+                        `<span><i class="orb-dot pos"></i>${t('orbital_positive')}</span>` +
+                        `<span><i class="orb-dot neg"></i>${t('orbital_negative')}</span>`;
+                }
+
+                function refreshMeta() {
+                    if (currentOrb) updateMeta(currentOrb);
+                }
+
+                /* ======================================================
+                   九、尺寸自适应
+                   ====================================================== */
+                function onResize() {
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+
+                    camera.aspect = w / h;
+                    camera.updateProjectionMatrix();
+
+                    renderer.setSize(w, h);
+                    composer.setSize(w, h);
+                    bloomPass.setSize(w, h);
+                }
+                window.addEventListener('resize', onResize);
+
+                /* ======================================================
+                   十、渲染循环
+                   ====================================================== */
+                let rafId = null;
+                let running = false;
+
+                function animate() {
+                    if (!running) return;
+                    rafId = requestAnimationFrame(animate);
+
+                    if (points) {
+                        const tt = Math.min(1, (performance.now() - fadeStart) / 750);
+                        const e = 1 - Math.pow(1 - tt, 3);            // easeOutCubic
+                        points.material.opacity = MODES[themeKey].opacity * e;
+                        points.scale.setScalar(0.93 + 0.07 * e);
+                    }
+
+                    controls.update();
+                    composer.render();
+                }
+
+                /* ======================================================
+                   十一、交互绑定 & 启动
+                   ====================================================== */
+                /* 轨道云主题按钮：点击时联动主页面主题（同时切换周期表与轨道云） */
+                themeBtnEl.addEventListener('click', () => {
+                    const mainBtn = document.getElementById('themeToggle');
+                    if (mainBtn) {
+                        mainBtn.click();
+                    } else {
+                        // 兜底：找不到主按钮时直接切换轨道云自身（理论上不会发生）
+                        applyMode(themeKey === 'dark' ? 'light' : 'dark', true);
+                    }
+                });
+
+                buildPaletteUI();
+                buildOrbitalUI();
+
+                /* ---------- 读取偏好 ---------- */
+                const prefs = loadPrefs();
+                /* 主题跟随主页面：读取 html[data-theme] */
+                themeKey = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                paletteIndex = (prefs && Number.isInteger(prefs.palette)
+                                && prefs.palette >= 0 && prefs.palette < PALETTES.length)
+                                ? prefs.palette : 0;
+
+                applyMode(themeKey, true);
+                setPalette(paletteIndex);
+
+                const startOrb = (prefs && prefs.orbital)
+                    ? (ORBITALS.find(o => o.id === prefs.orbital) || ORBITALS[0])
+                    : ORBITALS[0];
+                setOrbital(startOrb);
+
+                onResize();
+
+                return {
+                    start() {
+                        if (running) return;
+                        running = true;
+                        onResize();
+                        animate();
+                    },
+                    stop() {
+                        running = false;
+                        if (rafId) {
+                            cancelAnimationFrame(rafId);
+                            rafId = null;
+                        }
+                    },
+                    refreshMeta,
+                    /* 供主页面 updateTheme 调用：同步轨道云主题 */
+                    setTheme(key) {
+                        if (key !== themeKey) {
+                            applyMode(key, true);
+                        }
+                    }
+                };
+            }
+
+            /* ---------- 打开 / 关闭轨道云 ---------- */
+            async function openOrbitalCloud() {
+                if (!orbitalOverlayEl) return;
+
+                orbitalOverlayEl.classList.add('active');
+                orbitalOverlayEl.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+
+                if (!orbitalAPI) {
+                    // 首次打开：显示加载提示并动态加载 Three.js
+                    if (orbitalLoadingEl) orbitalLoadingEl.classList.add('visible');
+
+                    if (!orbitalPromise) orbitalPromise = createOrbitalCloud();
+
+                    try {
+                        orbitalAPI = await orbitalPromise;
+                    } catch (err) {
+                        console.error('原子轨道云加载失败:', err);
+                        if (orbitalLoadingEl) orbitalLoadingEl.classList.remove('visible');
+                        // 加载失败时，关闭 overlay 并恢复滚动，避免界面锁死
+                        orbitalOverlayEl.classList.remove('active');
+                        orbitalOverlayEl.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                        return;
+                    }
+                    if (orbitalLoadingEl) orbitalLoadingEl.classList.remove('visible');
+                }
+
+                // 覆盖层本身可能已关闭，需再确认一次
+                if (orbitalOverlayEl.classList.contains('active')) {
+                    orbitalAPI.start();
+                }
+            }
+
+            function closeOrbitalCloud() {
+                if (!orbitalOverlayEl) return;
+                orbitalOverlayEl.classList.remove('active');
+                orbitalOverlayEl.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                if (orbitalAPI) orbitalAPI.stop();
+            }
+
+            function initOrbitalCloud() {
+                const toggleBtn = document.getElementById('orbitalToggle');
+                const closeBtn = document.getElementById('orbitalClose');
+                if (toggleBtn) toggleBtn.addEventListener('click', openOrbitalCloud);
+                if (closeBtn) closeBtn.addEventListener('click', closeOrbitalCloud);
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && orbitalOverlayEl && orbitalOverlayEl.classList.contains('active')) {
+                        closeOrbitalCloud();
+                    }
+                });
+            }
+
             function init() {
                 currentLang = detectBrowserLang();
                 document.querySelectorAll('.lang-btn').forEach(b =>
@@ -4090,6 +5550,7 @@
                 initFavorites();
                 initSlingButton();
                 initPayModal();
+                initOrbitalCloud();
                 requestAnimationFrame(() => updateSlider());
                 window.addEventListener('resize', () => { requestAnimationFrame(updateSlider); });
                 phaseColorToggle.addEventListener('click', () => {
